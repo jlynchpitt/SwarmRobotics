@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 
 class Motor:
 	def __init__(self, in1PinNum, in2PinNum, pwmPinNum):
-		GPIO.setmode(GPIO.BOARD)
+		#GPIO.setmode(GPIO.BOARD)
 		
 		self.in1PinNum = in1PinNum
 		GPIO.setup(self.in1PinNum, GPIO.OUT)
@@ -15,7 +15,7 @@ class Motor:
 		
 		GPIO.setup(pwmPinNum, GPIO.OUT)
 		self.pwmPin = GPIO.PWM(pwmPinNum, 1000) # TODO: Confirm frequency
-		self.pwmPin.start(0)
+		self.pwmPin.start(10)
 		
 	def setMode(self, mode):
 		if mode == 0: # Stop motor
@@ -27,7 +27,7 @@ class Motor:
 		elif mode == 2: # Clockwise
 			GPIO.output(self.in1PinNum, GPIO.HIGH)
 			GPIO.output(self.in2PinNum, GPIO.LOW)
-		else #counter clockwise
+		else: #counter clockwise
 			GPIO.output(self.in1PinNum, GPIO.LOW)
 			GPIO.output(self.in2PinNum, GPIO.HIGH)
 			
