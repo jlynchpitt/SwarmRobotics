@@ -19,96 +19,108 @@ boundsInit = True
 bridge = ""
 ratio = 1
 
+def calculateLineDistance(pt1, pt2):
+    dist = math.sqrt((pt1[0] - pt2[0])**2 + (pt1[1] - pt2[1])**2)
+    return dist
 
-def mouseClick(event, x, y, flags, param):
-    global greenLower, greenUpper, boundsInit, colorImage, isColorImageReady, bridge
-    if event == cv2.EVENT_LBUTTONDOWN:
-        """if isColorImageReady:
-            pixel = colorImage[x,y]
-            if boundsInit:
-                if pixel[0] < greenLower[0]:
-                    greenLower[0] = pixel[0]
-                    
-                if pixel[1] < greenLower[1]:
-                    greenLower[1] = pixel[1]
-
-                if pixel[2] < greenLower[2]:
-                    greenLower[2] = pixel[2]
-
-                #Check upper bounds
-                if pixel[0] > greenUpper[0]:
-                    greenUpper[0] = pixel[0]
-                if pixel[1] > greenUpper[1]:
-                    greenUpper[1] = pixel[1]
-                if pixel[2] > greenUpper[2]:
-                    greenUpper[2] = pixel[2]
-            else:
-                greenLower = deepcopy(pixel)
-                greenUpper = deepcopy(pixel)
-                boundsInit = True"""
-        print("lower: " + str(greenLower) + " upper: " + str(greenUpper))
+def getTipPoint(pts):
+    #print(str(pts))
+    #Calculate line distances
+    line1 = calculateLineDistance(pts[0][0], pts[1][0])
+    line2 = calculateLineDistance(pts[0][0], pts[2][0])
+    line3 = calculateLineDistance(pts[1][0], pts[2][0])
     
+    #Find longest line - draw a circle in the 1 point not on that line
+    if line1 > line2 and line1 > line3:
+        #Line 1 max
+        x = pts[2][0][0]
+        y = pts[2][0][1]
+    elif line2 > line3:
+        #Line 2 max
+        x = pts[1][0][0]
+        y = pts[1][0][1]
+    else:
+        #Line 3 max
+        x = pts[0][0][0]
+        y = pts[0][0][1]
+        
+    return (x,y)
+
+
 def updateColorImage(data):
     global colorImage, isColorImageReady, ratio
-    try:
-            frame = bridge.imgmsg_to_cv2(data, "bgr8")
-            resize_frame = imutils.resize(frame, width=600)
-            blur = cv2.GaussianBlur(resize_frame, (11, 11), 0)
-            colorImage = cv2.cvtColor(blur, cv2.COLOR_BGR2HSV)
-            isColorImageReady = True
-            ratio = frame.shape[0] / float(resize_frame.shape[0])
-    except CvBridgeError, e:
-        print e
-        print "colorImage"
+    colorImage = data
+    isColorImageReady = True
 
 def main():
     global colorImage, isColorImageReady, greenLower, greenUpper, boundsInit, bridge
+    imPub = rospy.Publisher('location_image', Image, queue_size=10)
+    maskPub = rospy.Publisher('mask_image', Image, queue_size=10)
     rospy.init_node('image_converter', anonymous=True)
     rospy.Subscriber("/camera/rgb/image_color", Image, updateColorImage, queue_size=10)
     bridge = CvBridge()
-    cv2.namedWindow("Color Image")
-    cv2.namedWindow("mask image")
-    cv2.setMouseCallback("Color Image", mouseClick)
+    #cv2.namedWindow("Color Image")
+    #cv2.namedWindow("mask image")
+
 
     while not isColorImageReady:
         pass
 
     while not rospy.is_shutdown():
+        try:
+            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
+        except CvBridgeError, e:
+            print e
+            print "colorImage"
+
+        #resize_frame = imutils.resize(color_image, width=300)
+        #ratio = color_image.shape[0] / float(resize_frame.shape[0])
+        
+        gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
+        blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        thresh = cv2.threshold(blur, 150, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.erode(thresh, None, iterations=1)
+        thresh = cv2.dilate(thresh, None, iterations=1)
+        
+        maskPub.publish(bridge.cv2_to_imgmsg(thresh, "mono8"))
+        #cv2.imshow("mask image", thresh)
+        #cv2.waitKey(1)
+
+        cntrs = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cntrs = cntrs[0] if imutils.is_cv2() else cntrs[1]
+        #maxC = max(cntrs, key=cv2.contourArea)
+        
+        for c in cntrs:
+            perim = cv2.arcLength(c, True)
+            approx = cv2.approxPolyDP(c, 0.04 * perim, True)
+            if len(approx) == 3:
+                #c = c.astype("float")
+                #c *= ratio
+                #c = c.astype("int")
+                #print(str(approx))
+                M = cv2.moments(c)
+                centerX = int(M["m10"] / M["m00"])
+                centerY = int(M["m01"] / M["m00"])
+                cv2.drawContours(color_image, [approx], -1, (0, 0, 255), 2)
+                #cv2.circle(color_image, (centerX, centerY), 7, (255, 0, 0), -1)
+                tip = getTipPoint(approx)
+                cv2.arrowedLine(color_image, (centerX, centerY), tip, (255, 0, 0), 2)
+                
+        #cv2.rectangle(color_image, (xLocation-10,yLocation-10), (xLocation+10,yLocation+10), (0,255,0), 2)
+        imageMessage = bridge.cv2_to_imgmsg(color_image, "bgr8")
         #try:
-        #    color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
+        #    conv_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
         #except CvBridgeError, e:
         #    print e
         #    print "colorImage"
-        color_image = colorImage
-        #construct mask of green objects
-        if boundsInit:
-            mask = cv2.inRange(color_image, greenLower, greenUpper)
-            mask = cv2.erode(mask, None, iterations=2)
-            mask = cv2.dilate(mask, None, iterations=1)
-            
-            cntrs = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            cntrs = cntrs[0] if imutils.is_cv2() else cntrs[1]
-            
-            for c in cntrs:
-                perim = cv2.arcLength(c, True)
-                approx = cv2.approxPolyDP(c, 0.04 * perim, True)
-                if len(approx) == 3:
-                    print("Triangle found")
-                    c = c.astype("float")
-                    c *= ratio
-                    c = c.astype("int")
-                    cv2.drawContours(color_image, [c], -1, (0, 255, 0), 2)
-
-            cv2.imshow("mask image", mask)
         
-
-        #cv2.rectangle(color_image, (xLocation-10,yLocation-10), (xLocation+10,yLocation+10), (0,255,0), 2)
-        cv2.imshow("Color Image", color_image)
-        cv2.waitKey(1)
+        imPub.publish(imageMessage)
+        #cv2.imshow("Color Image", conv_image)
+        #cv2.waitKey(1)
 
     cv2.destroyAllWindows()
 
 
  
 if __name__ == '__main__':
-    main()
+        main()
