@@ -6,7 +6,11 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from collections import deque
 
+global queue, max
+queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
+max = 0
 colorImage = Image()
 isColorImageReady = False;
 
@@ -23,6 +27,7 @@ def updateSensorData(data):
 	#	coming in at once from multiple robots
 	#Or possibly have each robot publish to a different topic
 	#	and have multiple subscibers/callback functions
+    queue.append(data)
     colorImage = data
     isColorImageReady = True
 
@@ -34,7 +39,7 @@ def main():
 	########################################################
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", Image, updateSensorData, queue_size=10)
-	imPub = rospy.Publisher('global_sensor_data', Image, queue_size=10)
+	globalPub = rospy.Publisher('global_sensor_data', Image, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
@@ -59,7 +64,7 @@ def main():
 		########################################################
 		#Publish data here
 		########################################################
-        imPub.publish(imageMessage)
+        globalPub.publish(imageMessage)
         
 
 

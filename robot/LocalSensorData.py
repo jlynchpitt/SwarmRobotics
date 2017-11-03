@@ -16,6 +16,10 @@ class SensorData():
 
 def main():
     global data
+    data = SensorData()
+    sensorAddr =  0x44 ##address of the light sensor
+    i2c = SMBus(1) ##initialize SMBus object using the bus number
+    i2c.write_byte_data(0x44, 1, 0xD) ##configures the temperature sensor
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
@@ -29,19 +33,23 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-		
+    while not isColorImageReady:
+        pass
+
+    while not rospy.is_shutdown():
+        try:
+            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
+        except CvBridgeError, e:
+            print e
+            print "colorImage"
 	########################################################
 	#All code for processing data/algorithm goes here
 	########################################################
-    data = SensorData()
-    sensorAddr =  0x44 ##address of the light sensor
-    i2c = SMBus(1) ##initialize SMBus object using the bus number
-    i2c.write_byte_data(0x44, 1, 0xD) ##configures the temperature sensor
 
-    num = 15
-    temp = 0
+        num = 15
+        temp = 0
 
-    while(temp < num):
+    ##while(temp < num): don't need this loop because the nodes run until we Ctrl-C out of them?
         ##reads and compiles the green data
         greenLow = i2c.read_byte_data(0x44, 9)
         greenHigh = i2c.read_byte_data(0x44, 10)
@@ -62,7 +70,6 @@ def main():
 	    #########################################################
         pub.publish(data)
 
-        temp = temp + 1
         time.sleep(1)
 
 
