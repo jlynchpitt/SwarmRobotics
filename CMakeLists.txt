@@ -3,11 +3,17 @@ project(Swarm)
 
 find_package(catkin REQUIRED COMPONENTS message_generation rospy ...)
 
-add_message_files()
+add_message_files(
+	FILES
+	SensorData.msg
+)
 
 add_service_files()
 
-generate_messages()
+generate_messages(
+	DEPENDENCIES
+	std_msgs
+)
 
 
 catkin_package(
