@@ -6,9 +6,11 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from swarm.msg import WheelSpeeds
 
-colorImage = Image()
-isColorImageReady = False;
+wheelSpeed = WheelSpeeds()
+wheelSpeed.leftWheel = 0
+wheelSpeed.rightWheel = 0
 
 ########################################################
 #Callback functions for each subscriber
@@ -18,43 +20,30 @@ isColorImageReady = False;
 #	processing in the main loop
 ########################################################
 def updateRobotCommands(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    global wheelSpeed
+    wheelSpeed = data
+	#Positive wheel speed is moving the wheel in the direction that would move the robot forward
+	#Negative wheel speed is moving the wheel in the direction that would move the robot backward
 	
 def main():
-    global colorImage, isColorImageReady
+    global wheelSpeed
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
-	#TODO: Change data types of subscribers
 	########################################################
-    rospy.init_node('robot_controller_node', anonymous=True)
-    rospy.Subscriber("/robot_commands", Image, updateRobotCommands, queue_size=10)
+    rospy.init_node('robot_node', anonymous=True)
+    rospy.Subscriber("/robot_commands", WheelSpeeds, updateRobotCommands, queue_size=10)
 	
-	########################################################
-	#Wait here for any data that needs to be ready
-	#For data that would crash the program if it was not
-	#	ready yet
-	########################################################
-    while not isColorImageReady:
-        pass
+	robot = Robot_Driver()
+	robot.rightWheel(0)
+	robot.leftWheel(0)
 
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
-		
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
-        
-        
-
-
-
- 
+		robot.rightWheel(wheelSpeed.rightWheel)
+		robot.leftWheel(wheelSpeed.leftWheel)
+		
 if __name__ == '__main__':
         main()

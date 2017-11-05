@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import time
 import RPi.GPIO as GPIO
-from Robot import Robot
+from Robot_Driver import Robot_Driver
 
-robot = Robot()
+robot = Robot_Driver()
 
 robot.forward()
 time.sleep(3)
