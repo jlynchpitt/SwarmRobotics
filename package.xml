@@ -1,5 +1,5 @@
 <package>
-    <name>Swarm</name>
+    <name>swarm</name>
     <version>1.1.1</version>
     <description> 
         This package has all the code for the University of Pittsburgh Swarm Robotics Senior Design group
@@ -9,7 +9,7 @@
     
     <buildtool_depend>catkin</buildtool_depend>
     <build_depend>message_generation</build_depend>
-	<exec_depend>message_runtime</exec_depend>
+	<!--<exec_depend>message_runtime</exec_depend>-->
     
-    <!--<run_depend>message_runtime</run_depend>-->
+    <run_depend>message_runtime</run_depend>
 </package>

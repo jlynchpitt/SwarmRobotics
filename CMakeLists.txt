@@ -1,14 +1,17 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(Swarm)
+project(swarm)
 
-find_package(catkin REQUIRED COMPONENTS message_generation rospy ...)
+find_package(catkin REQUIRED COMPONENTS 
+    rospy
+    std_msgs
+    message_generation)
 
 add_message_files(
 	FILES
 	SensorData.msg
 )
 
-add_service_files()
+#add_service_files()
 
 generate_messages(
 	DEPENDENCIES
