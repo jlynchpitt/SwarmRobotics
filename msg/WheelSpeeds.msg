@@ -1,0 +1,2 @@
+int8 leftWheel
+int8 rightWheel
