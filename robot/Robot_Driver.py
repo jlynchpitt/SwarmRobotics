@@ -1,4 +1,10 @@
 #!/usr/bin/python
+
+########################################################
+# Class function:
+#	Driver for sending commands to the motor driver/motors
+########################################################
+
 import RPi.GPIO as GPIO
 from Motor import Motor
 

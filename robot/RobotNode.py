@@ -1,11 +1,20 @@
 #!/usr/bin/env python
+
+########################################################
+# Node function:
+#	Interface with the actual robot driver/robot to move it
+#	Convert wheel speeds to correct clockwise/counterclockwise 
+#		rotation for each wheel
+#
+# Data in: 
+#	commanded wheel speeds
+########################################################
+
 import roslib
 #roslib.load_manifest('rosopencv')
 import sys
 import rospy
 import math
-from std_msgs.msg import String
-from sensor_msgs.msg import Image
 from swarm.msg import WheelSpeeds
 
 wheelSpeed = WheelSpeeds()
