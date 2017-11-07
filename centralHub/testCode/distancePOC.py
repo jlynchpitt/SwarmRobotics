@@ -69,7 +69,7 @@ def main():
         topLengthStr = "%.2f" % topLength
 
         cv2.putText(color_image, topLengthStr, (im_width/2+15,0+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-        cv2.putText(color_image, sideLengthStr, (0+15,im_height/2+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        #cv2.putText(color_image, sideLengthStr, (0+15,im_height/2+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
 		imageMessage = bridge.cv2_to_imgmsg(color_image, "bgr8")
         imPub.publish(imageMessage)
