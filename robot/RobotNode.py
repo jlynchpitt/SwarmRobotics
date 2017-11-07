@@ -18,6 +18,8 @@ import math
 from swarm.msg import WheelSpeeds
 from Robot_Driver import Robot_Driver
 
+robot = Robot_Driver()
+
 wheelSpeed = WheelSpeeds()
 wheelSpeed.leftWheel = 0
 wheelSpeed.rightWheel = 0
@@ -36,7 +38,7 @@ def updateRobotCommands(data):
     #Negative wheel speed is moving the wheel in the direction that would move the robot backward
     
 def main():
-    global wheelSpeed
+    global wheelSpeed, robot
     
     ########################################################
     #Initialize the node, any subscribers and any publishers
@@ -44,7 +46,6 @@ def main():
     rospy.init_node('robot_node', anonymous=True)
     rospy.Subscriber("/robot_commands", WheelSpeeds, updateRobotCommands, queue_size=10)
     
-    robot = Robot_Driver()
     robot.rightWheel(0)
     robot.leftWheel(0)
 
@@ -56,4 +57,11 @@ def main():
         robot.leftWheel(wheelSpeed.leftWheel)
         
 if __name__ == '__main__':
-        main()
+	global robot
+	try:
+		main()
+	except :
+		print("exception occurred")
+	finally:
+		print("cleaning up gpio")
+		robot.cleanup()
