@@ -35,7 +35,7 @@ cmdVel.y = 0
 #Try to just store the incoming data + do all
 #   processing in the main loop
 ########################################################
-def updateSuggestedMovemement(data):
+def updateSuggestedMovement(data):
     global sugVel
     sugVel = data
     
@@ -52,7 +52,7 @@ def main():
     ########################################################
     rospy.init_node('obstacle_avoidance_node', anonymous=True)
     rospy.Subscriber("/suggested_movement", RobotVelocity, updateSuggestedMovement, queue_size=10)
-    rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
+    #rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
     pub = rospy.Publisher('commanded_movement', RobotVelocity, queue_size=10)
     
     while not rospy.is_shutdown():

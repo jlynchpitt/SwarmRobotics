@@ -57,7 +57,7 @@ def main():
     #TODO: Change data types of subscribers
     ########################################################
     rospy.init_node('robot_controller_node', anonymous=True)
-    rospy.Subscriber("/commandedMovement", RobotVelocity, updateCommandedMovement, queue_size=10)
+    rospy.Subscriber("/commanded_movement", RobotVelocity, updateCommandedMovement, queue_size=10)
     #rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
     pub = rospy.Publisher('robot_commands', WheelSpeeds, queue_size=10)
     
@@ -74,12 +74,15 @@ def main():
         # 1. Calculate vector magnitude + angle from XY velocities
         # 2. Calculate desired wheel speed (vMagnitude) 
         #       (identical wheel speed for each wheel if robot was moving forward in a straight line)
-        vMagnitude = math.sqrt(cmdVel.x^2 + cmdVel.y^2)
+	vMagnitude = math.sqrt(math.pow(cmdVel.x,2) + math.pow(cmdVel.y,2))
         
         #limit vMagnitude to 0-100 since wheel speeds are a percentage of max speed
         if vMagnitude > 100:
             vMagnitude = 100
         
+	print("cmd x: " + str(cmdVel.x) + " cmd y: " + str(cmdVel.y))
+	print("velocity magnitude: " + str(vMagnitude))
+
         #TODO: Confirm this calculation is correct
         #If python 2.7 may do integer division for y/x
 	tanDivAmount = cmdVel.y

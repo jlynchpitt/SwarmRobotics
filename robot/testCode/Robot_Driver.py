@@ -55,15 +55,15 @@ class Robot_Driver:
 		# right CW left CCW
 		self.leftMotor.setMode(3)
 		self.rightMotor.setMode(2)
-		self.leftMotor.setSpeed(25)
-		self.rightMotor.setSpeed(25)
+		self.leftMotor.setSpeed(100)
+		self.rightMotor.setSpeed(100)
 		
 	def backward(self):
 		# right CCW left CW
 		self.leftMotor.setMode(2)
 		self.rightMotor.setMode(3)
-		self.leftMotor.setSpeed(25)
-		self.rightMotor.setSpeed(25)
+		self.leftMotor.setSpeed(100)
+		self.rightMotor.setSpeed(100)
 	def cleanup(self):
 		self.stop()
 		GPIO.cleanup()
