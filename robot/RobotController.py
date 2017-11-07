@@ -58,7 +58,7 @@ def main():
     ########################################################
     rospy.init_node('robot_controller_node', anonymous=True)
     rospy.Subscriber("/commandedMovement", RobotVelocity, updateCommandedMovement, queue_size=10)
-    rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
+    #rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
     pub = rospy.Publisher('robot_commands', WheelSpeeds, queue_size=10)
     
     ########################################################
@@ -82,7 +82,10 @@ def main():
         
         #TODO: Confirm this calculation is correct
         #If python 2.7 may do integer division for y/x
-        vAngle = math.degrees(math.atan(y/x))
+	tanDivAmount = cmdVel.y
+	if cmdVel.x != 0:
+		tanDivAmount = cmdVel.y/cmdVel.x
+        vAngle = math.degrees(math.atan(tanDivAmount))
         
         # 3. Read in current robot actual angle from location data
         # 4. Use PID to calculate difference in wheel speeds to turn 

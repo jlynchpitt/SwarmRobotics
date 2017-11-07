@@ -26,21 +26,23 @@ class Robot_Driver:
 		self.rightMotor = Motor(13, 11, 12)
 		
 	def rightWheel(self, speed):
+		global CLOCKWISE, CCLOCKWISE
 		#clockwise forward
 		if(speed >= 0):
-			self.rightMotor.setMode(CLOCKWISE)
+			self.rightMotor.setMode(self.CLOCKWISE)
 			self.rightMotor.setSpeed(speed)
 		else:
-			self.rightMotor.setMode(CCLOCKWISE)
+			self.rightMotor.setMode(self.CCLOCKWISE)
 			self.rightMotor.setSpeed(-1*speed)
 			
 	def leftWheel(self, speed):
+		global CLOCKWISE, CCLOCKWISE
 		#counter clockwise forward
 		if(speed >= 0):
-			self.leftMotor.setMode(CCLOCKWISE)
+			self.leftMotor.setMode(self.CCLOCKWISE)
 			self.leftMotor.setSpeed(speed)
 		else:
-			self.leftMotor.setMode(CLOCKWISE)
+			self.leftMotor.setMode(self.CLOCKWISE)
 			self.leftMotor.setSpeed(-1*speed)
 		
 	def stop(self):
