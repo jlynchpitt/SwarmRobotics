@@ -14,8 +14,8 @@ isDepthImageReady = False;
 colorImage = Image()
 isColorImageReady = False;
 
-depth_width = 320
-depth_height = 240
+depth_width = 640 #320
+depth_height = 480 #240
 im_width = 640
 im_height = 480
 
@@ -53,26 +53,51 @@ def main():
             print e
             print "colorImage"
         
-        print("depth height: " + str(depth.height) + " depth width: " str(depth.width))
-        print("image height: " + str(color_image.height) + " image width: " str(color_image.width))
+        #print("depth height: " + str(depthImage.height) + " depth width: " + str(depthImage.width))
+        #print("image height: " + str(colorImage.height) + " image width: " + str(colorImage.width))
     
-        centerDepth = depth.item(depth_height/2,depth_width/2,0)
-        topDepth = depth.item(0,depth_width/2,0)
-        sideDepth = depth.item(depth_height/2,0,0)
+        centerDepth1 = depth.item(depth_height/2,depth_width/2)
+        centerDepth2 = depth.item(depth_height/2+1,depth_width/2)
+        centerDepth3 = depth.item(depth_height/2,depth_width/2+1)
+        centerDepth4 = depth.item(depth_height/2,depth_width/2-1)
+        centerDepth5 = depth.item(depth_height/2-1,depth_width/2)
         
-        #halfSideLength^2 + centerDepth^2 = topDepth^2
-        sideLength = 2*sqrt(math.pow(topDepth, 2) - math.pow(centerDepth, 2))
-        sideLengthStr = "%.2f" % sideLength
-
-        #halfTopLength^2 + centerDepth^2 = sideDepth^2
-        topLength = 2*sqrt(math.pow(sideDepth, 2) - math.pow(centerDepth, 2))
-        topLengthStr = "%.2f" % topLength
-
-        cv2.putText(color_image, topLengthStr, (im_width/2+15,0+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-        #cv2.putText(color_image, sideLengthStr, (0+15,im_height/2+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        centerDepth = 0
+        count = 0
+        if not math.isnan(centerDepth1):
+            centerDepth = centerDepth + centerDepth1
+            count = count + 1
+            
+        if not math.isnan(centerDepth2):
+            centerDepth = centerDepth + centerDepth2
+            count = count + 1
+            
+        if not math.isnan(centerDepth3):
+            centerDepth = centerDepth + centerDepth3
+            count = count + 1
+            
+        if not math.isnan(centerDepth4):
+            centerDepth = centerDepth + centerDepth4
+            count = count + 1
+            
+        if not math.isnan(centerDepth5):
+            centerDepth = centerDepth + centerDepth5
+            count = count + 1
+        
+        if count > 0:
+            centerDepth = centerDepth/count
+        
+        topWidth = 2*centerDepth*math.tan(math.radians(32.4)) #57 degrees 58.5 degrees
+        sideHeight = 2*centerDepth*math.tan(math.radians(24.3)) #43 degrees 46.6 degrees
+        
+        #print("center: " + str(centerDepth) + " top: " + str(topWidth) + " side: " + str(sideHeight))
+        
+        cv2.putText(color_image, str(topWidth), (im_width/2+15,0+25), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        cv2.putText(color_image, str(sideHeight), (0+25,im_height/2+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        cv2.putText(color_image, str(centerDepth), (im_width/2,im_height/2), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
         imageMessage = bridge.cv2_to_imgmsg(color_image, "bgr8")
-        imPub.publish(imageMessage)
+        pub.publish(imageMessage)
     cv2.destroyAllWindows()
 
 

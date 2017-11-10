@@ -57,7 +57,7 @@ def main():
             print e
             print "colorImage"
         
-        depthValue = depth.item(yLocation,xLocation,0)
+        depthValue = depth.item(yLocation,xLocation)
 
         #print "Depth at (%i,%i) is %f." % (xLocation,yLocation,depthValue)
 
