@@ -36,6 +36,7 @@ def main():
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", SensorData, updateSensorData, queue_size=10)
 	globalPub = rospy.Publisher('global_sensor_data', SensorData, queue_size=10)
+    globalPub2 = rospy.Publisher('suggested_movement', SensorData, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready

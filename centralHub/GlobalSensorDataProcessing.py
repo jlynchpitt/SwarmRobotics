@@ -7,12 +7,13 @@ import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from collections import deque
+from swarm.msg import SensorData
 
 global queue, max
 queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
 max = 0
 colorImage = Image()
-isColorImageReady = False;
+isColorImageReady = False
 
 ########################################################
 #Callback functions for each subscriber
@@ -32,7 +33,7 @@ def updateSensorData(data):
     isColorImageReady = True
 
 def main():
-    global colorImage, isColorImageReady
+    global colorImage
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
@@ -40,15 +41,13 @@ def main():
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", Image, updateSensorData, queue_size=10)
 	globalPub = rospy.Publisher('global_sensor_data', Image, queue_size=10)
+    globalPub2 = rospy.Publisher('commanded_movement', )
 	
 	########################################################
 	#Wait here for any data that needs to be ready
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    while not isColorImageReady:
-        pass
-
     while not rospy.is_shutdown():
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
@@ -59,7 +58,6 @@ def main():
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
-        
 		
 		########################################################
 		#Publish data here

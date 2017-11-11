@@ -8,14 +8,10 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from smbus2 import SMBus
 import time
-
-class SensorData():
-    red = 0
-    green = 0
-    blue = 0
+from swarm.msg import SensorData
 
 def main():
-    global data
+    global data, colorImage
     data = SensorData()
     sensorAddr =  0x44 ##address of the light sensor
     i2c = SMBus(1) ##initialize SMBus object using the bus number
@@ -33,9 +29,6 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    while not isColorImageReady:
-        pass
-
     while not rospy.is_shutdown():
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
@@ -46,14 +39,10 @@ def main():
 	#All code for processing data/algorithm goes here
 	########################################################
 
-        num = 15
-        temp = 0
-
-    ##while(temp < num): don't need this loop because the nodes run until we Ctrl-C out of them?
         ##reads and compiles the green data
         greenLow = i2c.read_byte_data(0x44, 9)
         greenHigh = i2c.read_byte_data(0x44, 10)
-        data.green = redHigh<<8 | redLow
+        data.green = greenHigh<<8 | greenLow
 
         ##reads and compiles the red data
         redLow = i2c.read_byte_data(0x44, 11)
@@ -63,7 +52,7 @@ def main():
         ##reads and compiles the blue data
         blueLow = i2c.read_byte_data(0x44, 13)
         blueHigh = i2c.read_byte_data(0x44, 14)
-        data.blue = redHigh<<8 | redLow
+        data.blue = blueHigh<<8 | blueLow
 		
 	    ########################################################
 	    #Publish data here
