@@ -30,11 +30,7 @@ def main():
 	#	ready yet
 	########################################################
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
+
 	########################################################
 	#All code for processing data/algorithm goes here
 	########################################################
