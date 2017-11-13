@@ -1,0 +1,22 @@
+<launch>
+    <node
+        pkg="swarm"
+        type="RobotNode"
+        name="robot_node"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="RobotController"
+        name="robot_controller"
+        respawn="true"
+    />
+    
+    <node
+        pkg="swarm"
+        type="ObstacleAvoidance"
+        name="robot_avoidance"
+        respawn="true"
+    />
+</launch>
