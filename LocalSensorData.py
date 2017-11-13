@@ -11,30 +11,26 @@ import time
 from swarm.msg import SensorData
 
 def main():
-    global data, colorImage
+    global data
     data = SensorData()
     sensorAddr =  0x44 ##address of the light sensor
     i2c = SMBus(1) ##initialize SMBus object using the bus number
-    i2c.write_byte_data(0x44, 1, 0xD) ##configures the temperature sensor
+    i2c.write_byte_data(0x44, 1, 0xD) ##configures the light sensor
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	#Note no subscribers needed for this node
 	########################################################
     rospy.init_node('local_sensor_data_node', anonymous=True)
-	pub = rospy.Publisher('local_sensor_data', Image, queue_size=10)
+    pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
+
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
 	########################################################
 	#All code for processing data/algorithm goes here
 	########################################################
@@ -42,7 +38,7 @@ def main():
         ##reads and compiles the green data
         greenLow = i2c.read_byte_data(0x44, 9)
         greenHigh = i2c.read_byte_data(0x44, 10)
-        data.green = greenHigh<<8 | greenLow
+        data.green = redHigh<<8 | redLow
 
         ##reads and compiles the red data
         redLow = i2c.read_byte_data(0x44, 11)
@@ -52,7 +48,7 @@ def main():
         ##reads and compiles the blue data
         blueLow = i2c.read_byte_data(0x44, 13)
         blueHigh = i2c.read_byte_data(0x44, 14)
-        data.blue = blueHigh<<8 | blueLow
+        data.blue = redHigh<<8 | redLow
 		
 	    ########################################################
 	    #Publish data here
