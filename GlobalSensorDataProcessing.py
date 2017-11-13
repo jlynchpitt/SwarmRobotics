@@ -9,10 +9,18 @@ from sensor_msgs.msg import Image
 from collections import deque
 from swarm.msg import SensorData
 
-global queue, max
+global queue
 queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
-max = 0
-currentRed, currentGreen, currentBlue, currentData
+currentRed, currentGreen, currentBlue, currentMax
+theData = SensorData()
+vData.robotID = 1
+vData.red = 0
+vData.green = 0
+vData.blue = 0
+
+cmdVel = RobotVelocity()
+vData.x = 0
+vData.y = 0
 
 ########################################################
 #Callback functions for each subscriber
@@ -36,7 +44,7 @@ def main():
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", SensorData, updateSensorData, queue_size=10)
 	globalPub = rospy.Publisher('global_sensor_data', SensorData, queue_size=10)
-    globalPub2 = rospy.Publisher('suggested_movement', SensorData, queue_size=10)
+    globalPub2 = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
@@ -50,17 +58,21 @@ def main():
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
-        currentData = queue.pop(0)
-        currentRed = currentData.red
-        currentGreen = currentData.green
-        currentBlue = currentData.blue
-        if(max < currentRed):
-            max = currentRed
+        theData = queue.pop(0)
+        currentRed = vData.red
+        currentGreen = vData.green
+        currentBlue = vData.blue
+        if(currentMax < currentRed):
+            currentMax = currentRed
+
+            
 		
 		########################################################
 		#Publish data here
 		########################################################
-        globalPub.publish(max) ##only publishing the global max value currently, will include other data later
+        globalPub.publish(theData) ##only publishing the global max value currently, will include other data later
+        if(currentMax < 1500):
+            globalPub2.publish(cmdVel)
         
 
 
