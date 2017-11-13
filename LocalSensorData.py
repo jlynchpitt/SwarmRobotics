@@ -17,23 +17,23 @@ def main():
     i2c = SMBus(1) ##initialize SMBus object using the bus number
     i2c.write_byte_data(0x44, 1, 0xD) ##configures the light sensor
     
-	########################################################
-	#Initialize the node, any subscribers and any publishers
-	#Note no subscribers needed for this node
-	########################################################
+    ########################################################
+    #Initialize the node, any subscribers and any publishers
+    #Note no subscribers needed for this node
+    ########################################################
     rospy.init_node('local_sensor_data_node', anonymous=True)
     pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
-	
-	########################################################
-	#Wait here for any data that needs to be ready
-	#For data that would crash the program if it was not
-	#	ready yet
-	########################################################
+    
+    ########################################################
+    #Wait here for any data that needs to be ready
+    #For data that would crash the program if it was not
+    #   ready yet
+    ########################################################
 
     while not rospy.is_shutdown():
-	########################################################
-	#All code for processing data/algorithm goes here
-	########################################################
+    ########################################################
+    #All code for processing data/algorithm goes here
+    ########################################################
 
         ##reads and compiles the green data
         greenLow = i2c.read_byte_data(0x44, 9)
@@ -49,10 +49,10 @@ def main():
         blueLow = i2c.read_byte_data(0x44, 13)
         blueHigh = i2c.read_byte_data(0x44, 14)
         data.blue = redHigh<<8 | redLow
-		
-	    ########################################################
-	    #Publish data here
-	    #########################################################
+        
+        ########################################################
+        #Publish data here
+        #########################################################
         pub.publish(data)
 
         time.sleep(1)
