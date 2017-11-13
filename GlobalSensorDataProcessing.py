@@ -13,14 +13,14 @@ global queue
 queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
 currentRed, currentGreen, currentBlue, currentMax
 theData = SensorData()
-vData.robotID = 1
-vData.red = 0
-vData.green = 0
-vData.blue = 0
+theData.robotID = 1
+theData.red = 0
+theData.green = 0
+theData.blue = 0
 
 cmdVel = RobotVelocity()
-vData.x = 0
-vData.y = 0
+cmdVel.x = 25
+cmdVel.y = 25
 
 ########################################################
 #Callback functions for each subscriber
@@ -59,9 +59,9 @@ def main():
 		#All code for processing data/algorithm goes here
 		########################################################
         theData = queue.pop(0)
-        currentRed = vData.red
-        currentGreen = vData.green
-        currentBlue = vData.blue
+        currentRed = theData.red
+        currentGreen = theData.green
+        currentBlue = theData.blue
         if(currentMax < currentRed):
             currentMax = currentRed
 
@@ -71,8 +71,10 @@ def main():
 		#Publish data here
 		########################################################
         globalPub.publish(theData) ##only publishing the global max value currently, will include other data later
-        if(currentMax < 1500):
-            globalPub2.publish(cmdVel)
+        if(currentMax > 1500):
+        	cmdVel.x = 0
+		cmdVel.y = 0
+	globalPub2.publish(cmdVel)
         
 
 
