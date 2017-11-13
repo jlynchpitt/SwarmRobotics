@@ -1,0 +1,16 @@
+<launch>
+    <node
+        pkg="swarm"
+        type="LocalSensorData.py"
+        name="local_data"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="GlobalSensorDataProcessing.py"
+        name="global_data"
+        respawn="true"
+    />
+    
+</launch>
