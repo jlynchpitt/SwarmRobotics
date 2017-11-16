@@ -77,8 +77,8 @@ def main():
         #ratio = color_image.shape[0] / float(resize_frame.shape[0])
         
         gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (5, 5), 0)
-        thresh = cv2.threshold(blur, 150, 255, cv2.THRESH_BINARY)[1]
+        #blur = cv2.GaussianBlur(gray, (5, 5), 0)
+        thresh = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.erode(thresh, None, iterations=1)
         thresh = cv2.dilate(thresh, None, iterations=1)
         
