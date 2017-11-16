@@ -11,6 +11,8 @@ add_message_files(
 	SensorData.msg
 	RobotVelocity.msg
 	WheelSpeeds.msg
+    RobotLocation.msg
+    RobotLocationList.msg
 )
 
 #add_service_files()

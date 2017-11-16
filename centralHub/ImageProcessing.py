@@ -6,9 +6,12 @@ import rospy
 import cv2
 import math
 import imutils
-from std_msgs.msg import String
+from swarm.msg import RobotLocation, RobotLocationList
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+
+locationList = RobotLocationList()
+locationList.robotList = []
 
 depthImage = Image()
 isDepthImageReady = False;
@@ -44,7 +47,7 @@ def updateColorImage(data):
     isColorImageReady = True
 
 def main():
-    global depthImage, isDepthImageReady, colorImage, isColorImageReady, bridge, dist_width, dist_height, image_width, image_height
+    global depthImage, isDepthImageReady, colorImage, isColorImageReady, bridge, dist_width, dist_height, image_width, image_height, locationList
     
     ########################################################
     #Initialize the node, any subscribers and any publishers
@@ -52,6 +55,7 @@ def main():
     rospy.init_node('image_converter_node', anonymous=True)
     rospy.Subscriber("/camera/depth/image", Image, updateDepthImage, queue_size=10)
     rospy.Subscriber("/camera/rgb/image_color", Image, updateColorImage, queue_size=10)
+    locPub = rospy.Publisher('robot_location', RobotLocationList, queue_size=10)
     imPub = rospy.Publisher('location_image', Image, queue_size=10)
     maskPub = rospy.Publisher('mask_image', Image, queue_size=10)
     
@@ -69,6 +73,9 @@ def main():
         pass
 
     while not rospy.is_shutdown():
+        #Reset list of robot locations
+        locationList.robotList = []
+        
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
             color_image_raw = color_image.copy()
@@ -107,10 +114,11 @@ def main():
                 #cv2.drawContours(color_image, [approx], -1, (255,0,0), 2)
 
         imPub.publish(bridge.cv2_to_imgmsg(color_image, "bgr8"))
+        locPub.publish(locationList)
     cv2.destroyAllWindows()
 
 def drawRobotInfo(color_image, color_image_raw, pts, contour):
-    global xPixelDist, yPixelDist
+    global xPixelDist, yPixelDist, locationList
     
     #Get line distances - calculate tip point
     line1 = calculateLineDistance(pts[0][0], pts[1][0])
@@ -160,6 +168,8 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
     allowLineDiff = 20 #% difference allowed between 2 oLines - triangle should be isosceles
     
     if area >= minArea and area <= maxArea and lineDiff < allowLineDiff:
+        robot = RobotLocation()
+        
         #if a robot:
         #   calculate distance coordinates
         M = cv2.moments(contour)
@@ -167,11 +177,15 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         centerY_pix = int(M["m01"] / M["m00"])
         
         #Find color of triangle
-        color = classify_triangle_color(color_image_raw, centerX_pix, centerY_pix)
+        robotInfo = classify_triangle_color(color_image_raw, centerX_pix, centerY_pix)
+        robot.robotID = robotInfo[1]
+        robot.robotColor = robotInfo[0]
 
         #Calculate location
         centerX_dist = centerX_pix * yPixelDist
         centerY_dist = centerY_pix * xPixelDist
+        robot.x = centerX_dist
+        robot.y = centerY_dist
         
         #Calculate angle https://www.wikihow.com/Find-the-Angle-Between-Two-Vectors
         length = math.sqrt((tipX-centerX_pix)**2 + (tipY-centerY_pix)**2)
@@ -179,6 +193,7 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         angle = math.degrees(math.acos(dot/(3*length)))
         if tipY > centerY_pix:
             angle = -1*angle
+        robot.angle = angle
         
         #Draw bounding triangle + direction arrow
         cv2.drawContours(color_image, [pts], -1, (0, 0, 255), 2)
@@ -195,7 +210,9 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         
         cv2.putText(color_image, locationText, (centerX_pix,centerY_pix+75), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         cv2.putText(color_image, angleText, (centerX_pix,centerY_pix+105), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-        cv2.putText(color_image, color, (centerX_pix,centerY_pix+135), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        cv2.putText(color_image, str(robot.robotID), (centerX_pix,centerY_pix+135), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        
+        locationList.robotList.append(robot)
         return True
     else: 
         return False
@@ -282,12 +299,18 @@ def classify_triangle_color(image, triangle_center_x, triangle_center_y):
               "blue" : (0,0,255),
               "yellow" : (255,255,0),
               }
+    ids = {"red" : 1,
+              "green" : 2,
+              "blue" : 3,
+              "yellow" : 4,
+              }
 
     manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2]) 
     distances = {k: manhattan(v, rgb_tuple) for k, v in colors.items()}
     color = min(distances, key=distances.get)
+    robotID = ids.get(color)
     #print(color)
-    return color
+    return (color, robotID)
  
 if __name__ == '__main__':
         main()
