@@ -71,6 +71,7 @@ def main():
     while not rospy.is_shutdown():
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
+            color_image_raw = color_image.copy()
         except CvBridgeError, e:
             print e
             print "colorImage"
@@ -82,7 +83,7 @@ def main():
         cv2.putText(color_image, stringSideHeight, (0+25,image_height/2+10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         
         # Find triangles and identify robots
-        gray = cv2.cvtColor(color_image, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(color_image_raw, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (11, 11), 0) #orig 5x5
         thresh = cv2.threshold(blur, 65, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.erode(thresh, None, iterations=2)
@@ -100,7 +101,7 @@ def main():
             perim = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * perim, True) #0rig 0.04*perim
             if len(approx) == 3:
-                if not drawRobotInfo(color_image, approx, c):
+                if not drawRobotInfo(color_image, color_image_raw, approx, c):
                     cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
             #else: #draw all contours for debugging purposes
                 #cv2.drawContours(color_image, [approx], -1, (255,0,0), 2)
@@ -108,7 +109,7 @@ def main():
         imPub.publish(bridge.cv2_to_imgmsg(color_image, "bgr8"))
     cv2.destroyAllWindows()
 
-def drawRobotInfo(color_image, pts, contour):
+def drawRobotInfo(color_image, color_image_raw, pts, contour):
     global xPixelDist, yPixelDist
     
     #Get line distances - calculate tip point
@@ -165,6 +166,9 @@ def drawRobotInfo(color_image, pts, contour):
         centerX_pix = int(M["m10"] / M["m00"]) 
         centerY_pix = int(M["m01"] / M["m00"])
         
+        #Find color of triangle
+        color = classify_triangle_color(color_image_raw, centerX_pix, centerY_pix)
+
         #Calculate location
         centerX_dist = centerX_pix * yPixelDist
         centerY_dist = centerY_pix * xPixelDist
@@ -191,6 +195,7 @@ def drawRobotInfo(color_image, pts, contour):
         
         cv2.putText(color_image, locationText, (centerX_pix,centerY_pix+75), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         cv2.putText(color_image, angleText, (centerX_pix,centerY_pix+105), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        cv2.putText(color_image, color, (centerX_pix,centerY_pix+135), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         return True
     else: 
         return False
@@ -246,6 +251,43 @@ def calculateSearchAreaDistance():
     
     xPixelDist = dist_width / image_width
     yPixelDist = dist_height / image_height    
+    
+# From: https://stackoverflow.com/questions/36439384/classifying-rgb-values-in-python
+def classify_triangle_color(image, triangle_center_x, triangle_center_y):
+    #Get an average rgb value of the triangle
+    
+    b1, g1, r1 = image[triangle_center_y, triangle_center_x]
+    b2, g2, r2 = image[triangle_center_y+1, triangle_center_x]
+    b3, g3, r3 = image[triangle_center_y-1, triangle_center_x]
+    b4, g4, r4 = image[triangle_center_y, triangle_center_x+1]
+    b5, g5, r5 = image[triangle_center_y, triangle_center_x-1]
+    
+    
+    red = int((int(r1) + int(r2) + int(r3) + int(r4) + int(r5))/5)
+    green = int((int(g1) + int(g2) + int(g3) + int(g4) + int(g5))/5)
+    blue = int((int(b1) + int(b2) + int(b3) + int(b4) + int(b5))/5)
+    
+    rgb_tuple = (red, green, blue)
+    
+    #print(str(red) + " " + str(green) + " " + str(blue))
+    #print("\n")
+        
+    # eg. rgb_tuple = (2,44,300)
+
+    # add as many colors as appropriate here, but for
+    # the stated use case you just want to see if your
+    # pixel is 'more red' or 'more green'
+    colors = {"red": (255, 0, 0),
+              "green" : (0,255,0),
+              "blue" : (0,0,255),
+              "yellow" : (255,255,0),
+              }
+
+    manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2]) 
+    distances = {k: manhattan(v, rgb_tuple) for k, v in colors.items()}
+    color = min(distances, key=distances.get)
+    #print(color)
+    return color
  
 if __name__ == '__main__':
         main()
