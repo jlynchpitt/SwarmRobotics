@@ -9,60 +9,68 @@ from sensor_msgs.msg import Image
 from collections import deque
 from swarm.msg import SensorData
 
-global queue, max
+
 queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
-max = 0
-colorImage = Image()
-isColorImageReady = False
+currentRed = 0
+currentGreen = 0
+currentBlue = 0
+currentMax = 0
+theData = SensorData()
+theData.robotID = 1
+theData.red = 0
+theData.green = 0
+theData.blue = 0
+
 
 ########################################################
 #Callback functions for each subscriber
-#	+ any other custom functions needed
+#   + any other custom functions needed
 #Do as little processing in the callback as possible
 #Try to just store the incoming data + do all
-#	processing in the main loop
+#   processing in the main loop
 ########################################################
 def updateSensorData(data):
-    global colorImage, isColorImageReady, ratio
+	global queue, currentRed, currentGreen, currentBlue, currentMax, cmdVel, theData
 	#May be best to store data in a buffer to deal with lots of data
-	#	coming in at once from multiple robots
-	#Or possibly have each robot publish to a different topic
-	#	and have multiple subscibers/callback functions
-    queue.append(data)
-    colorImage = data
-    isColorImageReady = True
-
+    	#   coming in at once from multiple robots
+    	#Or possibly have each robot publish to a different topic
+    	#   and have multiple subscibers/callback functions
+    	#queue.append(data)
+	theData = data
 def main():
-    global colorImage
-    
-	########################################################
-	#Initialize the node, any subscribers and any publishers
-	########################################################
+    global queue, currentRed, currentGreen, currentBlue, currentMax, cmdVel, theData 
+    ########################################################
+    #Initialize the node, any subscribers and any publishers
+    ########################################################
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
-    rospy.Subscriber("/local_sensor_data", Image, updateSensorData, queue_size=10)
-	globalPub = rospy.Publisher('global_sensor_data', Image, queue_size=10)
-    globalPub2 = rospy.Publisher('commanded_movement', )
-	
-	########################################################
-	#Wait here for any data that needs to be ready
-	#For data that would crash the program if it was not
-	#	ready yet
-	########################################################
+    rospy.Subscriber("/local_sensor_data", SensorData, updateSensorData, queue_size=10)
+    globalPub = rospy.Publisher('global_sensor_data', SensorData, queue_size=10)
+    
+    ########################################################
+    #Wait here for any data that needs to be ready
+    #For data that would crash the program if it was not
+    #   ready yet
+    ########################################################
+
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
-		
-		########################################################
-		#All code for processing data/algorithm goes here
-		########################################################
-		
-		########################################################
-		#Publish data here
-		########################################################
-        globalPub.publish(imageMessage)
+       
+        
+        ########################################################
+        #All code for processing data/algorithm goes here
+        ########################################################
+        #theData = queue.pop()
+        currentRed = theData.red
+        currentGreen = theData.green
+        currentBlue = theData.blue
+        if(currentMax < currentRed):
+            currentMax = currentRed
+
+            
+        
+        ########################################################
+        #Publish data here
+        ########################################################
+        globalPub.publish(theData) ##only publishing the global max value currently, needs to include the coordinate values
         
 
 
