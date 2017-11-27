@@ -6,9 +6,18 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from swarm.msg import SensorData, RobotVelocity
 
-colorImage = Image()
-isColorImageReady = False;
+counter = 0
+cmdVel = RobotVelocity()
+cmdVel.x = 25
+cmdVel.y = 25
+
+theData = SensorData()
+theData.robotID = 1
+theData.red = 0
+theData.green = 0
+theData.blue = 0
 
 ########################################################
 #Callback functions for each subscriber
@@ -33,37 +42,33 @@ def updateLocation(data):
     isColorImageReady = True
 
 def main():
-    global colorImage, isColorImageReady
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	#TODO: Change data types of subscribers
 	########################################################
     rospy.init_node('goal_pso_node', anonymous=True)
-    rospy.Subscriber("/local_sensor_data", Image, updateLocalData, queue_size=10)
-    rospy.Subscriber("/global_sensor_data", Image, updateGlobalData, queue_size=10)
+    rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
+    rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
-	pub = rospy.Publisher('suggested_movement', Image, queue_size=10)
+    pub = rospy.Publisher('suggested_movement', Image, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    while not isColorImageReady:
-        pass
-
+	
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
+
 		
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
-        
+
+        if(counter = 3) ##iteration biased to the current max
+
+        else: ##iterations not biased
 		
 		########################################################
 		#Publish data here
