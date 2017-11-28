@@ -6,18 +6,30 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
-from swarm.msg import SensorData, RobotVelocity
+from swarm.msg import SensorData, RobotVelocity, RobotLocation
 
-counter = 0
 cmdVel = RobotVelocity()
 cmdVel.x = 25
 cmdVel.y = 25
+
+theLocation = RobotLocation()
+theLocation.robotID = 1
+theLocation.robotColor = ""
+theLocation.x = 0
+theLocation.y = 0
+theLocation.angle = 0
 
 theData = SensorData()
 theData.robotID = 1
 theData.red = 0
 theData.green = 0
 theData.blue = 0
+
+currentData = SensorData()
+currentData.robotID = 1
+currentData.red = 0
+currentData.green = 0
+currentData.blue = 0
 
 ########################################################
 #Callback functions for each subscriber
@@ -27,19 +39,13 @@ theData.blue = 0
 #	processing in the main loop
 ########################################################
 def updateLocalData(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    currentData = data
 	
 def updateGlobalData(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    theData = data
 	
 def updateLocation(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    theLocation = data
 
 def main():
     
@@ -66,9 +72,7 @@ def main():
 		#All code for processing data/algorithm goes here
 		########################################################
 
-        if(counter = 3) ##iteration biased to the current max
 
-        else: ##iterations not biased
 		
 		########################################################
 		#Publish data here
