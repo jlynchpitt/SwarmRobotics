@@ -6,9 +6,39 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
+from swarm.msg import SensorData, RobotVelocity, RobotLocation, RobotLocationList
 
-colorImage = Image()
-isColorImageReady = False;
+cmdVel = RobotVelocity()
+cmdVel.x = 25
+cmdVel.y = 25
+
+theList = RobotLocationList()
+
+targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+targetLocation.robotID = 1
+targetLocation.robotColor = ""
+targetLocation.x = 0
+targetLocation.y = 0
+targetLocation.angle = 0
+
+currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
+currentLocation.robotID = 1
+currentLocation.robotColor = ""
+currentLocation.x = 0
+currentLocation.y = 0
+currentLocation.angle = 0
+
+theData = SensorData() ##theData: SensorData() of the global data
+theData.robotID = 1
+theData.red = 0
+theData.green = 0
+theData.blue = 0
+
+currentData = SensorData() ##theData: SensorData() of the local data
+currentData.robotID = 1
+currentData.red = 0
+currentData.green = 0
+currentData.blue = 0
 
 ########################################################
 #Callback functions for each subscriber
@@ -18,61 +48,58 @@ isColorImageReady = False;
 #	processing in the main loop
 ########################################################
 def updateLocalData(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    currentData = data
 	
 def updateGlobalData(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+    theData = data
 	
-def updateLocation(data):
-    global colorImage, isColorImageReady, ratio
-    colorImage = data
-    isColorImageReady = True
+def updateLocationList(data):
+    theList = data
 
 def main():
-    global colorImage, isColorImageReady
-    
+    global vectorX, vectorY
 	########################################################
 	#Initialize the node, any subscribers and any publishers
-	#TODO: Change data types of subscribers
 	########################################################
     rospy.init_node('goal_pso_node', anonymous=True)
-    rospy.Subscriber("/local_sensor_data", Image, updateLocalData, queue_size=10)
-    rospy.Subscriber("/global_sensor_data", Image, updateGlobalData, queue_size=10)
-    rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
-	pub = rospy.Publisher('suggested_movement', Image, queue_size=10)
+    rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
+    rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
+    rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
+    pub = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    while not isColorImageReady:
-        pass
-
+	
     while not rospy.is_shutdown():
-        try:
-            color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
-        except CvBridgeError, e:
-            print e
-            print "colorImage"
+
 		
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
-        
+
+        for ele in theList: ##searches the list for the robotLccation with the ID matching the one sent through globalData
+            if ele.robotID == theData.robotID:
+                targetLocation = ele
+
+        for ele in theList:
+            if ele.robotID == currentData.robotID:
+                currentLocation = ele
+
+        vectorX = targetLocation.x - currentLocation.x
+        vectorY = targetLocation.y - currentLocation.y
 		
 		########################################################
 		#Publish data here
 		########################################################
-        pub.publish(imageMessage)
+        pub.publish(cmdVel)
         
 
 
-
+##read in globalData, has robotID. Use ID to search the list for the robot location data. Use data to determine an x and y vector.
+#TODO I get the RobotID from the lcoal data, is this accurate? or is there something else I should subscribe to?
  
 if __name__ == '__main__':
         main()

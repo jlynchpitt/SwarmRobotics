@@ -111,9 +111,8 @@ def main():
         currentAngle = location.angle
         angleDiff = vAngle - currentAngle
         angleDiffABS = math.fabs(angleDiff)
-        
+
         wheelDiff = 0
-        
         DEADZONE = 5 #+- angle to not turn anymore
         if angleDiffABS < DEADZONE or angleDiffABS > (360-DEADZONE):
             if angleDiff >= 0 and angleDiff <= 180:
@@ -131,7 +130,7 @@ def main():
                 
             if angleToTurn < 45:
                 wheelDiff = 5
-            elif angleToTurn < 90:
+            elif angleToTurn < 90
                 wheelDiff = 10
             else:
                 wheelDiff = 15

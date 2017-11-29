@@ -88,7 +88,7 @@ def main():
             centerDepth = centerDepth/count
         
         topWidth = 2*centerDepth*math.tan(math.radians(32.4)) #57 degrees 58.5 degrees
-        sideHeight = 2*centerDepth*math.tan(math.radians(24.3)) #43 degrees 46.6 degrees
+        sideHeight = 2*centerDepth*math.tan(math.radians(25.2)) #43 degrees 46.6 degrees 24.3 orig
         
         #print("center: " + str(centerDepth) + " top: " + str(topWidth) + " side: " + str(sideHeight))
         
