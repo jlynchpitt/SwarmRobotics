@@ -75,6 +75,7 @@ def main():
     while not rospy.is_shutdown():
         #Reset list of robot locations
         locationList.robotList = []
+        locationList.numRobots = 0
         
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
@@ -188,11 +189,34 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         robot.y = centerY_dist
         
         #Calculate angle https://www.wikihow.com/Find-the-Angle-Between-Two-Vectors
-        length = math.sqrt((tipX-centerX_pix)**2 + (tipY-centerY_pix)**2)
-        dot = 3*(tipX-centerX_pix)
-        angle = math.degrees(math.acos(dot/(3*length)))
-        if tipY > centerY_pix:
-            angle = -1*angle
+        #length = math.sqrt((tipX-centerX_pix)**2 + (tipY-centerY_pix)**2)
+        #dot = 3*(tipX-centerX_pix)
+        #angle = math.degrees(math.acos(dot/(3*length)))
+        #if tipY > centerY_pix:
+        #    angle = -1*angle
+        #robot.angle = angle
+        #Check if on xy axis
+        x = tipX - centerX_pix
+        y = tipY - centerY_pix
+        
+        angle = 0
+        if x >= 0 and y == 0:
+            angle = 0
+        else if x == 0 and y > 0:
+            angle = 90
+        else if x < 0 and y == 0:
+            angle = 180
+        else if x == 0 and y < 0:
+            angle = 270
+        else if x > 0 and y > 0: #quadrant I
+            angle = math.degrees(math.atan(y/x))        
+        else if x < 0 and y > 0: #quadrant II
+            angle = 180 + math.degrees(math.atan(y/x))
+        else if x < 0 and y < 0: #quadrant III
+            angle = 180 + math.degrees(math.atan(y/x))
+        else: # if x > 0 and y < 0: #quadrant IV
+            angle = 360 + math.degrees(math.atan(y/x))
+        
         robot.angle = angle
         
         #Draw bounding triangle + direction arrow
@@ -213,6 +237,7 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         cv2.putText(color_image, str(robot.robotID), (centerX_pix,centerY_pix+135), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         
         locationList.robotList.append(robot)
+        locationList.numRobots = locationList.numRobots + 1
         return True
     else: 
         return False
