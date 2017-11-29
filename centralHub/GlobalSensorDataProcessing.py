@@ -7,7 +7,7 @@ import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from collections import deque
-from swarm.msg import SensorData
+from swarm.msg import SensorData, RobotLocation, RobotLocationList
 
 
 queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
@@ -21,6 +21,15 @@ theData.robotID = 1
 theData.red = 0
 theData.green = 0
 theData.blue = 0
+
+maxData = SensorData()
+maxData.robotID = 1
+maxData.red = 0
+maxData.green = 0
+maxData.blue = 0
+
+theList = RobotLocationList()
+
 
 
 
@@ -47,7 +56,6 @@ def main():
     ########################################################
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", SensorData, updateSensorData, queue_size=10)
-    rospy.Subscriber("/robot_location", RobotLocation, updateRobotLocation, queue_size=10)
     sensorPub = rospy.Publisher('global_sensor_data', SensorData, queue_size=10)
     
     ########################################################
@@ -63,18 +71,15 @@ def main():
         #All code for processing data/algorithm goes here
         ########################################################
         #theData = queue.pop()
-        currentRed = theData.red
-        currentGreen = theData.green
-        currentBlue = theData.blue
-        if(currentMax < currentRed):
-            currentMax = currentRed
+        if(theData.red > maxData.red):
+            maxData = theData
 
             
         
         ########################################################
         #Publish data here
         ########################################################
-        sensorPub.publish(theData)
+        sensorPub.publish(maxData)
         
 
 
