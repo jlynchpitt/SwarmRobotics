@@ -72,6 +72,7 @@ def updateLocationList(data):
 
 def main():
     global vectorX, vectorY
+    global counter = 0
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -106,8 +107,13 @@ def main():
             localMaxData = currentData
             localMaxPos = currentLocation
 
-        vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
-        vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
+        if((theData.red - currentData.red) > 200 || counter < 30): ##if the global max is significantly larger than current value, keep going
+            vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
+            vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
+            counter += 1
+        else: ##else the robot is probably near the global max, stop the robot
+            vectorX = 0
+            vectorY = 0
 
         cmdVel.x = vectorX
         cmdVel.y = vectorY
