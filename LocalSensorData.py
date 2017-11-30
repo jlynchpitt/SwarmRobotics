@@ -38,7 +38,7 @@ def main():
         ##reads and compiles the green data
         greenLow = i2c.read_byte_data(0x44, 9)
         greenHigh = i2c.read_byte_data(0x44, 10)
-        data.green = redHigh<<8 | redLow
+        data.green = greenHigh<<8 | greenLow
 
         ##reads and compiles the red data
         redLow = i2c.read_byte_data(0x44, 11)
@@ -48,7 +48,7 @@ def main():
         ##reads and compiles the blue data
         blueLow = i2c.read_byte_data(0x44, 13)
         blueHigh = i2c.read_byte_data(0x44, 14)
-        data.blue = redHigh<<8 | redLow
+        data.blue = blueHigh<<8 | blueLow
         
         ########################################################
         #Publish data here
