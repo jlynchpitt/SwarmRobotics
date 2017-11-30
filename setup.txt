@@ -1,0 +1,18 @@
+Central Hub setup
+Open new terminal (ctrl-Alt-t)
+Open 4 tabs in that terminal (ctrl-shift-t)
+run the following 4 commands in each tab
+1. roscore
+2. roslaunch openni_launch openni.launch
+3a. cd catkin_ws
+3b. source devel/setup.bash
+3c. rosrun swarm ImageProcessing.py
+4. rosrun image_view image_view image:=/location_image
+
+Robot setup
+run the following command on each new tab then enter password: ssh pi@192.168.1.110
+launch the robot on one tab
+roslaunch swarm robot.launch
+Send commands to move the robot via command line - open new terminal or run sensor nodes + algorithm
+example command: rostopic pub /suggested_command swarm/RobotVelocity '{x: 10, y: 10}'
+
