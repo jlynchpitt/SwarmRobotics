@@ -85,7 +85,7 @@ def main():
         
         #   2. Determine if robot close to edge of frame
         if(foundLocation == True):
-            BUFFER = 0.1 # In meters
+            BUFFER = 0.15 # In meters
             robotOnEdge = False
             if location.y < BUFFER or location.x < BUFFER or (locationList.width - location.x) < BUFFER or (locationList.height - location.y) < BUFFER:
 		robotOnEdge = True
