@@ -19,7 +19,7 @@ import roslib
 import sys
 import rospy
 import math
-from swarm.msg import RobotVelocity
+from swarm.msg import RobotVelocity, RobotLocationList, RobotLocation
 
 sugVel = RobotVelocity()
 sugVel.x = 0
@@ -85,10 +85,10 @@ def main():
         
         #   2. Determine if robot close to edge of frame
         if(foundLocation == True):
-            BUFFER = 0.25 # In meters
+            BUFFER = 0.1 # In meters
             robotOnEdge = False
             if location.y < BUFFER or location.x < BUFFER or (locationList.width - location.x) < BUFFER or (locationList.height - location.y) < BUFFER:
-                robotOnEdge = True
+		robotOnEdge = True
                 goalVelocityMagnitude = 50
                 x = centerX - location.x
                 y = location.y - centerY
@@ -97,6 +97,7 @@ def main():
                 magMultiplier = math.sqrt(goalVelocityMagnitude/currentMagnitude)
                 cmdVel.x = x*magMultiplier
                 cmdVel.y = y*magMultiplier
+		print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
                 
             #   3a. If close to edge direct robot to center of frame
             #   3b. If not close to edge pass along suggested movement
