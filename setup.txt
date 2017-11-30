@@ -16,3 +16,5 @@ roslaunch swarm robot.launch
 Send commands to move the robot via command line - open new terminal or run sensor nodes + algorithm
 example command: rostopic pub /suggested_command swarm/RobotVelocity '{x: 10, y: 10}'
 
+swarm folder location on robot:
+catkin_ws/src/swarm
