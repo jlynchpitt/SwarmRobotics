@@ -76,8 +76,8 @@ def main():
         #Reset list of robot locations
         locationList.robotList = []
         locationList.numRobots = 0
-        locationList.width = image_width
-        locationList.height = image_height
+        locationList.width = dist_width
+        locationList.height = dist_height
         
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
@@ -111,8 +111,9 @@ def main():
             perim = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * perim, True) #0rig 0.04*perim
             if len(approx) == 3:
-                if not drawRobotInfo(color_image, color_image_raw, approx, c):
-                    cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
+                drawRobotInfo(color_image, color_image_raw, approx, c)
+                #if not drawRobotInfo(color_image, color_image_raw, approx, c):
+                    #cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
             #else: #draw all contours for debugging purposes
                 #cv2.drawContours(color_image, [approx], -1, (255,0,0), 2)
 
@@ -166,9 +167,10 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
     
     #check area + line distances to determine if a robot    
     # expected area = 55.125 cm^2
-    maxArea = 55 #cm^2
-    minArea = 20
+    maxArea = 75 #cm^2
+    minArea = 40
     allowLineDiff = 20 #% difference allowed between 2 oLines - triangle should be isosceles
+    #print("Area: " + str(area) + " lineDIff: " + str(lineDiff))
     
     if area >= minArea and area <= maxArea and lineDiff < allowLineDiff:
         robot = RobotLocation()
@@ -199,25 +201,25 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         #robot.angle = angle
         #Check if on xy axis
         x = tipX - centerX_pix
-        y = tipY - centerY_pix
+        y = centerY_pix - tipY
         
         angle = 0
         if x >= 0 and y == 0:
             angle = 0
-        else if x == 0 and y > 0:
+        elif x == 0 and y > 0:
             angle = 90
-        else if x < 0 and y == 0:
+        elif x < 0 and y == 0:
             angle = 180
-        else if x == 0 and y < 0:
+        elif x == 0 and y < 0:
             angle = 270
-        else if x > 0 and y > 0: #quadrant I
-            angle = math.degrees(math.atan(y/x))        
-        else if x < 0 and y > 0: #quadrant II
-            angle = 180 + math.degrees(math.atan(y/x))
-        else if x < 0 and y < 0: #quadrant III
-            angle = 180 + math.degrees(math.atan(y/x))
+        elif x > 0 and y > 0: #quadrant I
+            angle = math.degrees(math.atan(float(y)/float(x)))        
+        elif x < 0 and y > 0: #quadrant II
+            angle = 180 + math.degrees(math.atan(float(y)/float(x)))
+        elif x < 0 and y < 0: #quadrant III
+            angle = 180 + math.degrees(math.atan(float(y)/float(x)))
         else: # if x > 0 and y < 0: #quadrant IV
-            angle = 360 + math.degrees(math.atan(y/x))
+            angle = 360 + math.degrees(math.atan(float(y)/float(x)))
         
         robot.angle = angle
         

@@ -4,6 +4,7 @@ import roslib
 import sys
 import rospy
 import math
+import random
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from swarm.msg import SensorData, RobotVelocity, RobotLocation, RobotLocationList
@@ -40,6 +41,19 @@ currentData.red = 0
 currentData.green = 0
 currentData.blue = 0
 
+localMaxData = SensorData()
+localMaxData.robotID = 1
+localMaxData.red = 0
+localMaxData.green = 0
+localMaxData.blue = 0
+
+localMaxPos = RobotLocation()
+localMaxPos.robotID = 1
+localMaxPos.robotColor = ""
+localMaxPos.x = 0
+localMaxPos.y = 0
+localMaxPos.angle = 0
+
 ########################################################
 #Callback functions for each subscriber
 #	+ any other custom functions needed
@@ -58,6 +72,7 @@ def updateLocationList(data):
 
 def main():
     global vectorX, vectorY
+    global counter = 0
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -84,12 +99,24 @@ def main():
             if ele.robotID == theData.robotID:
                 targetLocation = ele
 
-        for ele in theList:
+        for ele in theList: ##searches the list for the robotLocatoin with the ID matching the currentData
             if ele.robotID == currentData.robotID:
                 currentLocation = ele
 
-        vectorX = targetLocation.x - currentLocation.x
-        vectorY = targetLocation.y - currentLocation.y
+        if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
+            localMaxData = currentData
+            localMaxPos = currentLocation
+
+        if((theData.red - currentData.red) > 200 || counter < 30): ##if the global max is significantly larger than current value, keep going
+            vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
+            vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
+            counter += 1
+        else: ##else the robot is probably near the global max, stop the robot
+            vectorX = 0
+            vectorY = 0
+
+        cmdVel.x = vectorX
+        cmdVel.y = vectorY
 		
 		########################################################
 		#Publish data here

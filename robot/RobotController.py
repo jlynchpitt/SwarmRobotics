@@ -142,7 +142,10 @@ def main():
                 wheelDiff = 20
             else:
                 wheelDiff = 30
-            
+        
+	# Set wheelDiff + velocity if current goal velocities both 0
+	if vMagnitude == 0:
+	    wheelDiff = 0
         # clockwise increase left wheel speed
         # counterclockwise - increase right wheel speed
         multiplier = -1
@@ -155,6 +158,7 @@ def main():
         wheelSpeed.rightWheel = vMagnitude + wheelDiff * multiplier * -1
         wheelSpeed.leftWheel = vMagnitude + wheelDiff * multiplier
 	print("wheel diff: " + str(wheelDiff))
+	print("right: " + str(wheelSpeed.rightWheel) + " left: " + str(wheelSpeed.leftWheel))
         pub.publish(wheelSpeed)
  
 if __name__ == '__main__':
