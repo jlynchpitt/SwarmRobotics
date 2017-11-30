@@ -111,8 +111,9 @@ def main():
             perim = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * perim, True) #0rig 0.04*perim
             if len(approx) == 3:
-                if not drawRobotInfo(color_image, color_image_raw, approx, c):
-                    cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
+                drawRobotInfo(color_image, color_image_raw, approx, c)
+                #if not drawRobotInfo(color_image, color_image_raw, approx, c):
+                    #cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
             #else: #draw all contours for debugging purposes
                 #cv2.drawContours(color_image, [approx], -1, (255,0,0), 2)
 
@@ -166,9 +167,10 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
     
     #check area + line distances to determine if a robot    
     # expected area = 55.125 cm^2
-    maxArea = 70 #cm^2
-    minArea = 20
+    maxArea = 75 #cm^2
+    minArea = 40
     allowLineDiff = 20 #% difference allowed between 2 oLines - triangle should be isosceles
+    #print("Area: " + str(area) + " lineDIff: " + str(lineDiff))
     
     if area >= minArea and area <= maxArea and lineDiff < allowLineDiff:
         robot = RobotLocation()
