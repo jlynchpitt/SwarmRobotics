@@ -6,26 +6,35 @@ import rospy
 import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
-from swarm.msg import SensorData, RobotVelocity, RobotLocation
+from swarm.msg import SensorData, RobotVelocity, RobotLocation, RobotLocationList
 
 cmdVel = RobotVelocity()
 cmdVel.x = 25
 cmdVel.y = 25
 
-theLocation = RobotLocation()
-theLocation.robotID = 1
-theLocation.robotColor = ""
-theLocation.x = 0
-theLocation.y = 0
-theLocation.angle = 0
+theList = RobotLocationList()
 
-theData = SensorData()
+targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+targetLocation.robotID = 1
+targetLocation.robotColor = ""
+targetLocation.x = 0
+targetLocation.y = 0
+targetLocation.angle = 0
+
+currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
+currentLocation.robotID = 1
+currentLocation.robotColor = ""
+currentLocation.x = 0
+currentLocation.y = 0
+currentLocation.angle = 0
+
+theData = SensorData() ##theData: SensorData() of the global data
 theData.robotID = 1
 theData.red = 0
 theData.green = 0
 theData.blue = 0
 
-currentData = SensorData()
+currentData = SensorData() ##theData: SensorData() of the local data
 currentData.robotID = 1
 currentData.red = 0
 currentData.green = 0
@@ -44,20 +53,19 @@ def updateLocalData(data):
 def updateGlobalData(data):
     theData = data
 	
-def updateLocation(data):
-    theLocation = data
+def updateLocationList(data):
+    theList = data
 
 def main():
-    
+    global vectorX, vectorY
 	########################################################
 	#Initialize the node, any subscribers and any publishers
-	#TODO: Change data types of subscribers
 	########################################################
     rospy.init_node('goal_pso_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
-    rospy.Subscriber("/location_data", Image, updateLocation, queue_size=10)
-    pub = rospy.Publisher('suggested_movement', Image, queue_size=10)
+    rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
+    pub = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
@@ -72,16 +80,26 @@ def main():
 		#All code for processing data/algorithm goes here
 		########################################################
 
+        for ele in theList: ##searches the list for the robotLccation with the ID matching the one sent through globalData
+            if ele.robotID == theData.robotID:
+                targetLocation = ele
 
+        for ele in theList:
+            if ele.robotID == currentData.robotID:
+                currentLocation = ele
+
+        vectorX = targetLocation.x - currentLocation.x
+        vectorY = targetLocation.y - currentLocation.y
 		
 		########################################################
 		#Publish data here
 		########################################################
-        pub.publish(imageMessage)
+        pub.publish(cmdVel)
         
 
 
-
+##read in globalData, has robotID. Use ID to search the list for the robot location data. Use data to determine an x and y vector.
+#TODO I get the RobotID from the lcoal data, is this accurate? or is there something else I should subscribe to?
  
 if __name__ == '__main__':
         main()

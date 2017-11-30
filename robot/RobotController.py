@@ -18,7 +18,6 @@
 #   wheel speeds
 ########################################################
 
-import PID
 import roslib
 #roslib.load_manifest('rosopencv')
 import sys
@@ -34,8 +33,6 @@ wheelSpeed.rightWheel = 0
 wheelSpeed.leftWheel = 0
 locationList = RobotLocationList()
 location = RobotLocation()
-
-pid = PID.PID(0.2, 0, 0)
 
 ROBOT_ID = 2
 
@@ -53,7 +50,7 @@ def updateCommandedMovement(data):
 def updateLocation(data):
     global locationList
     locationList = data
-
+    
 def main():
     global cmdVel, wheelSpeed, pid, locationList, location
     
@@ -63,14 +60,8 @@ def main():
     ########################################################
     rospy.init_node('robot_controller_node', anonymous=True)
     rospy.Subscriber("/commanded_movement", RobotVelocity, updateCommandedMovement, queue_size=10)
-    rospy.Subscriber("/location_data", RobotLocationList, updateLocation, queue_size=10)
+    rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
     pub = rospy.Publisher('robot_commands', WheelSpeeds, queue_size=10)
-    
-    ####################
-    #Initialize pid
-    ####################
-    pid.SetPoint=0.0
-    pid.setSampleTime(0.1)
     
     ########################################################
     #Wait here for any data that needs to be ready
@@ -91,25 +82,34 @@ def main():
         if vMagnitude > 100:
             vMagnitude = 100
         
-	    print("cmd x: " + str(cmdVel.x) + " cmd y: " + str(cmdVel.y))
-	    print("velocity magnitude: " + str(vMagnitude))
+	#print("cmd x: " + str(cmdVel.x) + " cmd y: " + str(cmdVel.y))
+	#print("velocity magnitude: " + str(vMagnitude))
 
         #TODO: Confirm this calculation is correct
         #If python 2.7 may do integer division for y/x
-	    tanDivAmount = cmdVel.y
-	    if cmdVel.x != 0:
-		    tanDivAmount = cmdVel.y/cmdVel.x
-            vAngle = math.degrees(math.atan(tanDivAmount))
-        else if cmdVel.y >= 0:
-            vAngle = 90
-        else:
-            vAngle = -90
-        
+	x = cmdVel.x
+	y = cmdVel.y
+	vAngle = 0
+	if x >= 0 and y == 0:
+	    vAngle = 0
+	elif x == 0 and y > 0:
+	    vAngle = 90
+	elif x < 0 and y == 0:
+	    vAngle = 180
+	elif x == 0 and y < 0:
+	    vAngle = 270
+	elif x > 0 and y > 0: #quadrant I
+	    vAngle = math.degrees(math.atan(float(y)/float(x)))
+	elif x < 0: #quadrant II + 3
+	    vAngle = 180 + math.degrees(math.atan(float(y)/float(x)))
+	else: #quadrant IV
+	    vAngle = 360 + math.degrees(math.atan(float(y)/float(x)))
+	
         # 3. Read in current robot actual angle from location data
         for i in range (0,locationList.numRobots):
             if(locationList.robotList[i].robotID == ROBOT_ID):
                 location = locationList.robotList[i]
-                print("Found location for green robot")
+                #print("Found location for green robot")
                 break
                 
         # 4. Calculate difference in wheel speeds to turn robot to desired angle
@@ -120,30 +120,28 @@ def main():
         currentAngle = location.angle
         angleDiff = vAngle - currentAngle
         angleDiffABS = math.fabs(angleDiff)
-        
+	print("current angle: " +str(currentAngle) + " target: " + str(vAngle) + " diff: " + str(angleDiff))
         wheelDiff = 0
-        
         DEADZONE = 5 #+- angle to not turn anymore
-        if angleDiffABS < DEADZONE or angleDiffABS > (360-DEADZONE):
+        if angleDiffABS > DEADZONE and angleDiffABS < (360-DEADZONE):
             if angleDiff >= 0 and angleDiff <= 180:
                 angleToTurn = angleDiff
                 clockWise = False
-            else if angleDiff <= 0 and angleDiff >= -180:
+            elif angleDiff <= 0 and angleDiff >= -180:
                 angleToTurn = angleDiffABS
                 clockWise = True
-            else if angleDiff > 180 and angleDiff < 360:
+            elif angleDiff > 180 and angleDiff < 360:
                 angleToTurn = 360 - angleDiff
                 clockWise = True
             else: #-181 ->> -360
                 angleToTurn = 360 + angleDiff
                 clockWise = False
-                
             if angleToTurn < 45:
-                wheelDiff = 5
-            else if angleToTurn < 90:
-                wheelDiff = 10
+                wheelDiff = 9
+            elif angleToTurn < 90:
+                wheelDiff = 20
             else:
-                wheelDiff = 15
+                wheelDiff = 30
             
         # clockwise increase left wheel speed
         # counterclockwise - increase right wheel speed
@@ -151,12 +149,12 @@ def main():
         if(clockWise == True):
             multiplier = 1
 
-        vMagnitude = 0 #TODO: This is temporary for testing
+        #vMagnitude = 0 #TODO: This is temporary for testing
         
         # 5. Publish calculated wheel speeds
         wheelSpeed.rightWheel = vMagnitude + wheelDiff * multiplier * -1
         wheelSpeed.leftWheel = vMagnitude + wheelDiff * multiplier
-
+	print("wheel diff: " + str(wheelDiff))
         pub.publish(wheelSpeed)
  
 if __name__ == '__main__':
