@@ -76,6 +76,8 @@ def main():
         #Reset list of robot locations
         locationList.robotList = []
         locationList.numRobots = 0
+        locationList.width = image_width
+        locationList.height = image_height
         
         try:
             color_image = bridge.imgmsg_to_cv2(colorImage, "bgr8")
