@@ -19,4 +19,6 @@
 9. confirm no messages  
 10. If failed try rosmsg list
   search for swarm/SensorData + any other custom messages
+11. Exit python  
+   `exit()`
 
