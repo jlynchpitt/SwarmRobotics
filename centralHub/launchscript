@@ -1,0 +1,115 @@
+#!/bin/bash
+
+# Bash strict mode
+set -euo pipefail
+IFS=$'\n\t'
+
+# Debug
+set -x
+
+# launchscript.sh
+# SSOE 2017
+# Author: Austin Whited
+
+# This will initialize the master on the host you run in on,
+# then initialize robots with communication to this master. 
+# Robots must be named r1-r$i, have username 'pi',  and 
+# have public key authentication setup for passwordless 
+# authentication from the master.
+
+## usage: ./launchscript.sh $i
+
+## example: ./launchscript.sh 4 
+
+## Config
+robots=1
+remote_launchfile_path='~/catkin_ws/src/swarmrobotics/launch/fromlaunchscript.launch'
+uri="http://$(hostname):11311/"
+# make a temp file
+launchfile=$(mktemp)
+function cleantemp { 
+  rm -f "$launchfile" 
+}
+# cleanup tempfile on exit
+trap cleantemp EXIT
+
+# launchfile template 
+
+
+
+echo $robots
+echo $remote_launchfile_path
+echo $uri
+
+# Start ROS master.
+killall -q roscore && echo -n "Killing old roscore"
+while pkill -0 roscore; do
+  echo -n .
+  sleep 1
+done
+nohup roscore &
+
+# ssh "export master uri; ./startrobot$i"
+
+## 
+for (( i=1; i<=$robots; i++ )) 
+do
+	echo "r$i"
+
+  # build roslaunch file
+  cat <<END > $launchfile 
+  <launch>
+      <remap from="/commanded_movement" to="r$i/commanded_movement" />
+      <remap from="/suggested_movement" to="r$i/suggested_movement" />
+      <node
+          pkg="swarm"
+          type="RobotNode.py"
+          name="robot_node"
+          respawn="true"
+      >
+      </node> 
+
+      <node
+          pkg="swarm"
+          type="RobotController.py"
+          name="robot_controller"
+          respawn="true"
+      >
+
+      </node>
+
+      <node
+          pkg="swarm"
+          type="ObstacleAvoidance.py"
+          name="robot_avoidance"
+          respawn="true"
+      >
+
+      </node>
+  </launch>
+END
+  # copy launchfile to robot r$i
+  scp $launchfile pi@pi-desktop:$remote_launchfile_path
+
+  # connect to robot r$i; set env vars; run roslaunch
+  ssh pi@pi-desktop << END
+    # set environment vars
+    echo "export ROS_MASTER_URI=$uri" > .bash_profile
+    echo "source ~/catkin_ws/devel/setup.bash" >> .bash_profile
+    killall -q roslaunch && echo -n "Killing old roslaunch"
+    while pkill -0 roslaunch; do
+      echo -n .
+      sleep 1
+    done
+    export ROS_MASTER_URI=$uri
+    source ~/catkin_ws/devel/setup.bash
+    if [[ ! -p myfifo ]]; then
+      mkfifo myfifo
+    fi
+    # run roslaunch 
+    echo -e "\nRunning roslaunch"
+    head -n 1 myfifo &
+    nohup roslaunch swarm fromlaunchscript.launch &> myfifo &
+END
+done
+
