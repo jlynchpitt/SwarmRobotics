@@ -4,8 +4,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-# Debug
-set -x
+# Uncomment line below for Debug mode
+# set -x
 
 # launchscript.sh
 # SSOE 2017
