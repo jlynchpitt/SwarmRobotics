@@ -22,7 +22,7 @@ IFS=$'\n\t'
 ## examples: ./launchscript 4 
 
 ## Config
-robots=1
+robots=$1
 remote_launchfile_path='~/catkin_ws/src/swarmrobotics/launch/fromlaunchscript.launch'
 uri="http://$(hostname):11311/"
 
