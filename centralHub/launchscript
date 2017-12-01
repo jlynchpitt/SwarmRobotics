@@ -96,11 +96,14 @@ do
       </node>
   </launch>
 END
-  # if no launchfile specified on $2, copy launchfile to robot r$i
-  scp $launchfile pi@pi-desktop:$remote_launchfile_path
+
+#  scp $launchfile pi@pi-desktop:$remote_launchfile_path #uncomment for testing
+  scp $launchfile r$i:$remote_launchfile_path # uncomment for demo
 
   # connect to robot r$i; set env vars; run roslaunch
-  ssh pi@pi-desktop << END
+
+#  ssh pi@pi-desktop << END # uncomment for testing
+  ssh r$i << END # unomment for demo
     # set environment vars
     echo "export ROS_MASTER_URI=$uri" > .bash_profile
     echo "source ~/catkin_ws/devel/setup.bash" >> .bash_profile
