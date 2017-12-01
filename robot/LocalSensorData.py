@@ -11,7 +11,7 @@ import time
 from swarm.msg import SensorData
 
 def main():
-    global data, colorImage
+    global data
     data = SensorData()
     sensorAddr =  0x44 ##address of the light sensor
     i2c = SMBus(1) ##initialize SMBus object using the bus number
@@ -22,7 +22,7 @@ def main():
 	#Note no subscribers needed for this node
 	########################################################
     rospy.init_node('local_sensor_data_node', anonymous=True)
-	pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
+    pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
