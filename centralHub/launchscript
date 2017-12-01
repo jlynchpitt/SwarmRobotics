@@ -17,29 +17,23 @@ IFS=$'\n\t'
 # have public key authentication setup for passwordless 
 # authentication from the master.
 
-## usage: ./launchscript.sh $i
+## usage: ./launchscript $i(required)
 
-## example: ./launchscript.sh 4 
+## examples: ./launchscript 4 
 
 ## Config
 robots=1
 remote_launchfile_path='~/catkin_ws/src/swarmrobotics/launch/fromlaunchscript.launch'
 uri="http://$(hostname):11311/"
-# make a temp file
+
+# check for path_to_launchfile 
+# if no path_to_launchfile, make a temp file
 launchfile=$(mktemp)
 function cleantemp { 
   rm -f "$launchfile" 
 }
 # cleanup tempfile on exit
 trap cleantemp EXIT
-
-# launchfile template 
-
-
-
-echo $robots
-echo $remote_launchfile_path
-echo $uri
 
 # Start ROS master.
 killall -q roscore && echo -n "Killing old roscore"
@@ -75,7 +69,6 @@ do
           name="robot_controller"
           respawn="true"
       >
-
       </node>
 
       <node
@@ -84,11 +77,26 @@ do
           name="robot_avoidance"
           respawn="true"
       >
+      </node>
 
+      <node
+          pkg="swarm"
+          type="GoalPSO.py"
+          name="goal_pso"
+          respawn="true"
+      >
+      </node>
+
+      <node
+          pkg="swarm"
+          type="LocalSensorData.py"
+          name="local_sensor_data"
+          respawn="true"
+      >
       </node>
   </launch>
 END
-  # copy launchfile to robot r$i
+  # if no launchfile specified on $2, copy launchfile to robot r$i
   scp $launchfile pi@pi-desktop:$remote_launchfile_path
 
   # connect to robot r$i; set env vars; run roslaunch
