@@ -1,7 +1,7 @@
 # SwarmRobotics
 
 ## Steps to install ros code
-1. create directory ~/catkin_ws/src/swarm
+1. create directory ~/catkin_ws/src/swarm 
 ..* `mkdir -p ~/catkin_ws/src/; cd $_`
 2. create /swarm as git repo - download code
 ..* `git clone https://github.com/jlynchpitt/SwarmRobotics; mv SwarmRobotics/ swarm/`
