@@ -26,8 +26,7 @@ robots=$1
 remote_launchfile_path='~/catkin_ws/src/swarmrobotics/launch/fromlaunchscript.launch'
 uri="http://$(hostname):11311/"
 
-# check for path_to_launchfile 
-# if no path_to_launchfile, make a temp file
+# create a temp file to later build the launchfile
 launchfile=$(mktemp)
 function cleantemp { 
   rm -f "$launchfile" 
@@ -44,8 +43,6 @@ done
 nohup roscore &
 
 # ssh "export master uri; ./startrobot$i"
-
-## 
 for (( i=1; i<=$robots; i++ )) 
 do
 	echo "r$i"
