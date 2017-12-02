@@ -8,6 +8,7 @@ import random
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from swarm.msg import SensorData, RobotVelocity, RobotLocation, RobotLocationList
+from Robot_Info import Robot_Info
 
 cmdVel = RobotVelocity()
 cmdVel.x = 25
@@ -87,6 +88,10 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
+
+	robotInfo = Robot_Info()
+	robID = robotInfo.getRobotID
+	
 	
     while not rospy.is_shutdown():
 
@@ -104,7 +109,7 @@ def main():
 
         if(len(theList) > 1):
             for ele in theList: ##searches the list for the robotLocatoin with the ID matching the currentData
-                if ele.robotID == currentData.robotID:
+                if ele.robotID == robID:
                     currentLocation = ele
         else:
             currentLocation = theList[0]

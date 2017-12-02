@@ -53,7 +53,7 @@ def main():
     #Test printing out robot ID
     #robotInfo = Robot_Info()
     #id = robotInfo.getRobotID()
-    print(id)
+    #print(id)
     while not rospy.is_shutdown():
         ########################################################
         #All code for processing data/algorithm goes here
