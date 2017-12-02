@@ -19,6 +19,8 @@ import roslib
 import sys
 import rospy
 import math
+from copy import deepcopy
+from Robot_Info import Robot_Info
 from swarm.msg import RobotVelocity, RobotLocationList, RobotLocation
 
 sugVel = RobotVelocity()
@@ -31,8 +33,9 @@ locationList = RobotLocationList()
 location = RobotLocation()
 isLocationReady = False
 
-ROBOT_ID = 2
-
+robotInfo = Robot_Info()
+ROBOT_ID = robotInfo.getRobotID()
+print(ROBOT_ID)
 ########################################################
 #Callback functions for each subscriber
 #   + any other custom functions needed
@@ -71,14 +74,17 @@ def main():
         #All code for processing data/algorithm goes here
         ########################################################
         #Initialize to suggested velocity in case no corrective action needs to be taken
-        cmdVel.x = sugVel.x
-        cmdVel.y = sugVel.y
+        newLocationList = deepcopy(locationList)
+	newSugVel = deepcopy(sugVel)
+	
+	cmdVel.x = newSugVel.x
+        cmdVel.y = newSugVel.y
         foundLocation = False
         
         #   1. Read in current robot actual angle from location data
-        for i in range (0,locationList.numRobots):
-            if(locationList.robotList[i].robotID == ROBOT_ID):
-                location = locationList.robotList[i]
+        for i in range (0,newLocationList.numRobots):
+            if(newLocationList.robotList[i].robotID == ROBOT_ID):
+                location = newLocationList.robotList[i]
                 foundLocation = True
                 #print("Found location for green robot")
                 break
@@ -87,7 +93,7 @@ def main():
         if(foundLocation == True):
             BUFFER = 0.15 # In meters
             robotOnEdge = False
-            if location.y < BUFFER or location.x < BUFFER or (locationList.width - location.x) < BUFFER or (locationList.height - location.y) < BUFFER:
+            if location.y < BUFFER or location.x < BUFFER or (newLocationList.width - location.x) < BUFFER or (newLocationList.height - location.y) < BUFFER:
 		robotOnEdge = True
                 goalVelocityMagnitude = 50
                 x = centerX - location.x

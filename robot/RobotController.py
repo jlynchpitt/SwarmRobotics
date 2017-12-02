@@ -23,6 +23,8 @@ import roslib
 import sys
 import rospy
 import math
+from copy import deepcopy
+from Robot_Info import Robot_Info
 from swarm.msg import RobotVelocity, WheelSpeeds, RobotLocationList, RobotLocation
 
 cmdVel = RobotVelocity()
@@ -34,7 +36,8 @@ wheelSpeed.leftWheel = 0
 locationList = RobotLocationList()
 location = RobotLocation()
 
-ROBOT_ID = 2
+robotInfo = Robot_Info()
+ROBOT_ID = robotInfo.getRobotID()
 
 ########################################################
 #Callback functions for each subscriber
@@ -72,11 +75,13 @@ def main():
         ########################################################
         #All code for processing data/algorithm goes here
         ########################################################
-        
+        newCmdVel = deepcopy(cmdVel)
+	newLocationList = deepcopy(locationList)
+	
         # 1. Calculate vector magnitude + angle from XY velocities
         # 2. Calculate desired wheel speed (vMagnitude) 
         #       (identical wheel speed for each wheel if robot was moving forward in a straight line)
-        vMagnitude = math.sqrt(math.pow(cmdVel.x,2) + math.pow(cmdVel.y,2))
+        vMagnitude = math.sqrt(math.pow(newCmdVel.x,2) + math.pow(newCmdVel.y,2))
         
         #limit vMagnitude to 0-100 since wheel speeds are a percentage of max speed
         if vMagnitude > 100:
@@ -87,8 +92,8 @@ def main():
 
         #TODO: Confirm this calculation is correct
         #If python 2.7 may do integer division for y/x
-	x = cmdVel.x
-	y = cmdVel.y
+	x = newCmdVel.x
+	y = newCmdVel.y
 	vAngle = 0
 	if x >= 0 and y == 0:
 	    vAngle = 0
@@ -106,9 +111,9 @@ def main():
 	    vAngle = 360 + math.degrees(math.atan(float(y)/float(x)))
 	
         # 3. Read in current robot actual angle from location data
-        for i in range (0,locationList.numRobots):
-            if(locationList.robotList[i].robotID == ROBOT_ID):
-                location = locationList.robotList[i]
+        for i in range (0,newLocationList.numRobots):
+            if(newLocationList.robotList[i].robotID == ROBOT_ID):
+                location = newLocationList.robotList[i]
                 #print("Found location for green robot")
                 break
                 
