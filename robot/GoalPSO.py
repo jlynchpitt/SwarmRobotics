@@ -95,23 +95,31 @@ def main():
 		#All code for processing data/algorithm goes here
 		########################################################
 
-        for ele in theList: ##searches the list for the robotLccation with the ID matching the one sent through globalData
-            if ele.robotID == theData.robotID:
-                targetLocation = ele
+        if(len(theList) > 1):
+            for ele in theList: ##searches the list for the robotLccation with the ID matching the one sent through globalData
+                if ele.robotID == theData.robotID:
+                    targetLocation = ele
+        else:
+            targetLocation = theList[0]
 
-        for ele in theList: ##searches the list for the robotLocatoin with the ID matching the currentData
-            if ele.robotID == currentData.robotID:
-                currentLocation = ele
+        if(len(theList) > 1):
+            for ele in theList: ##searches the list for the robotLocatoin with the ID matching the currentData
+                if ele.robotID == currentData.robotID:
+                    currentLocation = ele
+        else:
+            currentLocation = theList[0]
 
         if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
             localMaxData = currentData
             localMaxPos = currentLocation
 
-        if((theData.red - currentData.red) > 200 || counter < 30): ##if the global max is significantly larger than current value, keep going
+        if(theData.red < 1500): ##case where the global max threshold has not been met, keep searching
             vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
             vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-            counter += 1
-        else: ##else the robot is probably near the global max, stop the robot
+        elif(theData.red > 1500 && currentData.red < 1500): ##case where global max threshold has been found, but this robot isn't there yet 
+            vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
+            vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
+        elif(theData.red > 1500 && currentData.red > 1500) ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 
