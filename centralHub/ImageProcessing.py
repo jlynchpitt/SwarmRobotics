@@ -94,10 +94,10 @@ def main():
         
         # Find triangles and identify robots
         gray = cv2.cvtColor(color_image_raw, cv2.COLOR_BGR2GRAY)
-        blur = cv2.GaussianBlur(gray, (11, 11), 0) #orig 5x5
+        blur = cv2.GaussianBlur(gray, (5, 5), 0) #orig 5x5
         thresh = cv2.threshold(blur, 65, 255, cv2.THRESH_BINARY)[1]
-        thresh = cv2.erode(thresh, None, iterations=2)
-        thresh = cv2.dilate(thresh, None, iterations=2)
+        #thresh = cv2.erode(thresh, None, iterations=2)
+        #thresh = cv2.dilate(thresh, None, iterations=2)
         
         maskPub.publish(bridge.cv2_to_imgmsg(thresh, "mono8"))
         #cv2.imshow("mask image", thresh)
@@ -111,9 +111,9 @@ def main():
             perim = cv2.arcLength(c, True)
             approx = cv2.approxPolyDP(c, 0.04 * perim, True) #0rig 0.04*perim
             if len(approx) == 3:
-                drawRobotInfo(color_image, color_image_raw, approx, c)
-                #if not drawRobotInfo(color_image, color_image_raw, approx, c):
-                    #cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
+                #drawRobotInfo(color_image, color_image_raw, approx, c)
+                if not drawRobotInfo(color_image, color_image_raw, approx, c):
+                    cv2.drawContours(color_image, [approx], -1, (0,255,0), 2)
             #else: #draw all contours for debugging purposes
                 #cv2.drawContours(color_image, [approx], -1, (255,0,0), 2)
 
@@ -163,11 +163,11 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
     area = oLine1 * oLine2 / 2
     lineDiff = 100*math.fabs(oLine1 - oLine2)/oLine2
     
-    #print("\nArea: " + str(area) + " line diff: " + str(lineDiff))
+    print("\nArea: " + str(area) + " line diff: " + str(lineDiff))
     
     #check area + line distances to determine if a robot    
     # expected area = 55.125 cm^2
-    maxArea = 75 #cm^2
+    maxArea = 70 #cm^2
     minArea = 40
     allowLineDiff = 20 #% difference allowed between 2 oLines - triangle should be isosceles
     #print("Area: " + str(area) + " lineDIff: " + str(lineDiff))
