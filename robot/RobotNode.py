@@ -17,6 +17,7 @@ import rospy
 import math
 from swarm.msg import WheelSpeeds
 from Robot_Driver import Robot_Driver
+from Robot_Info import Robot_Info
 
 robot = Robot_Driver()
 
@@ -48,7 +49,11 @@ def main():
     
     robot.rightWheel(0)
     robot.leftWheel(0)
-
+	
+    #Test printing out robot ID
+    #robotInfo = Robot_Info()
+    #id = robotInfo.getRobotID()
+    print(id)
     while not rospy.is_shutdown():
         ########################################################
         #All code for processing data/algorithm goes here
@@ -57,11 +62,11 @@ def main():
         robot.leftWheel(wheelSpeed.leftWheel)
         
 if __name__ == '__main__':
-	global robot
+	robot
 	try:
 		main()
 	except :
-		print("exception occurred")
+		print("exception occurred" + str(sys.exc_info()[0]))
 	finally:
 		print("cleaning up gpio")
 		robot.cleanup()
