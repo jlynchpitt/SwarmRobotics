@@ -10,7 +10,6 @@ from collections import deque
 from swarm.msg import SensorData, RobotLocation, RobotLocationList
 
 
-queue = deque() ##deque uses FIFO, queue.pop(0) will pop the first element, queue.append() will append to the end
 currentRed = 0
 currentGreen = 0
 currentBlue = 0
@@ -41,7 +40,7 @@ theList = RobotLocationList()
 #   processing in the main loop
 ########################################################
 def updateSensorData(data):
-	global queue, currentRed, currentGreen, currentBlue, currentMax, cmdVel, theData
+	global theData
 	#May be best to store data in a buffer to deal with lots of data
     	#   coming in at once from multiple robots
     	#Or possibly have each robot publish to a different topic
@@ -50,7 +49,7 @@ def updateSensorData(data):
 	theData = data
 
 def main():
-    global queue, currentRed, currentGreen, currentBlue, currentMax, cmdVel, theData 
+    global  currentRed, currentGreen, currentBlue, currentMax, theData
     ########################################################
     #Initialize the node, any subscribers and any publishers
     ########################################################
@@ -70,7 +69,6 @@ def main():
         ########################################################
         #All code for processing data/algorithm goes here
         ########################################################
-        #theData = queue.pop()
         if(theData.red > maxData.red):
             maxData = theData
 

@@ -1,0 +1,23 @@
+<launch>
+    <node
+        pkg="swarm"
+        type="RobotNode.py"
+        name="robot_node"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="RobotController.py"
+        name="robot_controller"
+        respawn="true"
+    />
+    
+    <node
+        pkg="swarm"
+        type="ObstacleAvoidance.py"
+        name="robot_avoidance"
+        respawn="true"
+    />
+
+</launch>

@@ -43,7 +43,7 @@ done
 nohup roscore &
 
 # ssh "export master uri; ./startrobot$i"
-for (( i=1; i<=$robots; i++ )) 
+for (( i=4; i<=$robots; i++ )) 
 do
 	echo "r$i"
 
@@ -103,6 +103,7 @@ END
   ssh r$i << END # unomment for demo
     # set environment vars
     echo "export ROS_MASTER_URI=$uri" > .bash_profile
+    echo "export ROS_HOSTNAME=r$i" >> .bash_profile
     echo "source ~/catkin_ws/devel/setup.bash" >> .bash_profile
     killall -q roslaunch && echo -n "Killing old roslaunch"
     while pkill -0 roslaunch; do
@@ -110,6 +111,7 @@ END
       sleep 1
     done
     export ROS_MASTER_URI=$uri
+    export ROS_HOSTNAME=r$i
     source ~/catkin_ws/devel/setup.bash
     if [[ ! -p myfifo ]]; then
       mkfifo myfifo
