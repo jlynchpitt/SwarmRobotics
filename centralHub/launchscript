@@ -5,7 +5,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # Uncomment line below for Debug mode
-# set -x
+ set -x
 
 # launchscript.sh
 # SSOE 2017
@@ -23,7 +23,7 @@ IFS=$'\n\t'
 
 ## Config
 robots=$1
-remote_launchfile_path='~/catkin_ws/src/swarmrobotics/launch/fromlaunchscript.launch'
+remote_launchfile_path='~/catkin_ws/src/swarm/launch/fromlaunchscript.launch'
 uri="http://$(hostname):11311/"
 
 # create a temp file to later build the launchfile
@@ -43,7 +43,8 @@ done
 nohup roscore &
 
 # ssh "export master uri; ./startrobot$i"
-for (( i=4; i<=$robots; i++ )) 
+# for (( i=1; i<=$robots; i++ )) # uncomment for sequential launch
+for i in 3 4   # uncomment for list of robots for testing
 do
 	echo "r$i"
 
