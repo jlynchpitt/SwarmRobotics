@@ -4,6 +4,7 @@ import roslib
 import sys
 import rospy
 import math
+import time
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from smbus2 import SMBus
@@ -23,6 +24,7 @@ def main():
 	########################################################
     rospy.init_node('local_sensor_data_node', anonymous=True)
     pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
+    time.sleep(1)
 	
 	########################################################
 	#Wait here for any data that needs to be ready

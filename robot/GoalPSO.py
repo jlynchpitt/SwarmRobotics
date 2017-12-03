@@ -5,6 +5,7 @@ import sys
 import rospy
 import math
 import random
+import time
 from copy import deepcopy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -91,6 +92,7 @@ def main():
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
     pub = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
+    time.sleep(1)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
@@ -99,10 +101,7 @@ def main():
 	########################################################
     tempList = deepcopy(theList)
     robotInfo = Robot_Info()
-    robID = robotInfo.getRobotID
-    print(robID)
-    print(currentData.red)
-    print(theData.red)
+    robID = robotInfo.getRobotI
 
     while not rospy.is_shutdown():
 
