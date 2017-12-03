@@ -118,13 +118,17 @@ def main():
             localMaxData = currentData
             localMaxPos = currentLocation
 
-        if(theData.red < 2500): ##case where the global max threshold has not been met, keep searching
+        if(theData.red < 1500): ##case where the global max threshold has not been met, keep searching
+            vectorX = 10
+            vectorY = 10
             vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (targetLocation.x - localMaxPos.x))
             vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (targetLocation.y - localMaxPos.y))
-        elif(theData.red > 2500 and currentData.red < 2500): ##case where global max threshold has been found, but this robot isn't there yet 
+        elif(theData.red > 1500 and currentData.red < 1500): ##case where global max threshold has been found, but this robot isn't there yet 
+            vectorX = 10
+            vectorY = 10
             vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
             vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 2500 and currentData.red > 2500): ##case where the robot is near the global max threshold, stop it
+        elif(theData.red > 1500 and currentData.red > 1500): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 
