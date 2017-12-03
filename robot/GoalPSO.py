@@ -56,8 +56,8 @@ localMaxPos.x = 0
 localMaxPos.y = 0
 localMaxPos.angle = 0
 
-vectorX = 0
-vectorY = 0
+vectorX = 25
+vectorY = 25
 
 ########################################################
 #Callback functions for each subscriber
@@ -79,7 +79,7 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVel
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -97,6 +97,9 @@ def main():
     tempList = deepcopy(theList)
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID
+    print(robID)
+    print(currentData.red)
+    print(theData.red)
 
     while not rospy.is_shutdown():
 
@@ -115,13 +118,13 @@ def main():
             localMaxData = currentData
             localMaxPos = currentLocation
 
-        if(theData.red < 1500): ##case where the global max threshold has not been met, keep searching
+        if(theData.red < 2500): ##case where the global max threshold has not been met, keep searching
+            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (targetLocation.x - localMaxPos.x))
+            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (targetLocation.y - localMaxPos.y))
+        elif(theData.red > 2500 and currentData.red < 2500): ##case where global max threshold has been found, but this robot isn't there yet 
             vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
             vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 1500 and currentData.red < 1500): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
-            vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 1500 and currentData.red > 1500): ##case where the robot is near the global max threshold, stop it
+        elif(theData.red > 2500 and currentData.red > 2500): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 
@@ -132,11 +135,7 @@ def main():
 		#Publish data here
 		########################################################
         pub.publish(cmdVel)
-        
 
 
-##read in globalData, has robotID. Use ID to search the list for the robot location data. Use data to determine an x and y vector.
-#TODO I get the RobotID from the lcoal data, is this accurate? or is there something else I should subscribe to?
- 
 if __name__ == '__main__':
         main()

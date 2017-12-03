@@ -49,7 +49,7 @@ def updateSensorData(data):
 	theData = data
 
 def main():
-    global  currentRed, currentGreen, currentBlue, currentMax, theData
+    global  currentRed, currentGreen, currentBlue, currentMax, theData, theList, maxData
     ########################################################
     #Initialize the node, any subscribers and any publishers
     ########################################################
@@ -64,7 +64,7 @@ def main():
     ########################################################
 
     while not rospy.is_shutdown():
-       
+        
         
         ########################################################
         #All code for processing data/algorithm goes here
@@ -72,7 +72,6 @@ def main():
         if(theData.red > maxData.red):
             maxData = theData
 
-            
         
         ########################################################
         #Publish data here
@@ -81,7 +80,5 @@ def main():
         
 
 
-
- 
 if __name__ == '__main__':
         main()
