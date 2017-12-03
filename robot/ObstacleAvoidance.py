@@ -91,18 +91,21 @@ def main():
         
         #   2. Determine if robot close to edge of frame
         if(foundLocation == True):
-            BUFFER = 0.15 # In meters
+            BUFFER = 0.25 # In meters
             robotOnEdge = False
             if location.y < BUFFER or location.x < BUFFER or (newLocationList.width - location.x) < BUFFER or (newLocationList.height - location.y) < BUFFER:
 		robotOnEdge = True
-                goalVelocityMagnitude = 50
+                goalVelocityMagnitude = 30
                 x = centerX - location.x
                 y = location.y - centerY
                 
-                currentMagnitude = math.sqrt(x**2 + y**2)
-                magMultiplier = math.sqrt(goalVelocityMagnitude/currentMagnitude)
+                currentMagnitude = math.sqrt((x*x) + (y*y))
+		print("current mag: " + str(currentMagnitude))
+                magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
+		print("multiplier: " + str(magMultiplier))
                 cmdVel.x = x*magMultiplier
                 cmdVel.y = y*magMultiplier
+		print("vector x: " + str(x) + " vector y: " + str(y))
 		print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
                 
             #   3a. If close to edge direct robot to center of frame
