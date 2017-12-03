@@ -5,6 +5,7 @@ import sys
 import rospy
 import math
 import random
+from copy import deepcopy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from swarm.msg import SensorData, RobotVelocity, RobotLocation, RobotLocationList
@@ -55,6 +56,9 @@ localMaxPos.x = 0
 localMaxPos.y = 0
 localMaxPos.angle = 0
 
+vectorX = 0
+vectorY = 0
+
 ########################################################
 #Callback functions for each subscriber
 #	+ any other custom functions needed
@@ -63,17 +67,19 @@ localMaxPos.angle = 0
 #	processing in the main loop
 ########################################################
 def updateLocalData(data):
+    global currentData
     currentData = data
 	
 def updateGlobalData(data):
+    global theData
     theData = data
 	
 def updateLocationList(data):
+    global theList
     theList = data
 
 def main():
-    global vectorX, vectorY
-    global counter = 0
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -88,31 +94,22 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
+    tempList = deepcopy(theList)
+    robotInfo = Robot_Info()
+    robID = robotInfo.getRobotID
 
-	robotInfo = Robot_Info()
-	robID = robotInfo.getRobotID
-	
-	
     while not rospy.is_shutdown():
 
-		
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
 
-        if(len(theList) > 1):
-            for ele in theList: ##searches the list for the robotLccation with the ID matching the one sent through globalData
-                if ele.robotID == theData.robotID:
-                    targetLocation = ele
-        else:
-            targetLocation = theList[0]
+        for i in range (0,tempList.numRobots):
+            if(tempList.robotList[i].robotID == theData.robotID):
+                targetLocation = tempList.robotList[i]
 
-        if(len(theList) > 1):
-            for ele in theList: ##searches the list for the robotLocatoin with the ID matching the currentData
-                if ele.robotID == robID:
-                    currentLocation = ele
-        else:
-            currentLocation = theList[0]
+            if(tempList.robotList[i].robotID == robID):
+                currentLocation = tempList.robotList[i]
 
         if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
             localMaxData = currentData
@@ -121,10 +118,10 @@ def main():
         if(theData.red < 1500): ##case where the global max threshold has not been met, keep searching
             vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
             vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 1500 && currentData.red < 1500): ##case where global max threshold has been found, but this robot isn't there yet 
+        elif(theData.red > 1500 and currentData.red < 1500): ##case where global max threshold has been found, but this robot isn't there yet 
             vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
             vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 1500 && currentData.red > 1500) ##case where the robot is near the global max threshold, stop it
+        elif(theData.red > 1500 and currentData.red > 1500): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 

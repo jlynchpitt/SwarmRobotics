@@ -19,4 +19,12 @@
         name="robot_avoidance"
         respawn="true"
     />
+
+    <node
+        pkg="swarm"
+        type="GoalPSO.py"
+        name="goal_pso_node"
+        respawn="true"
+    />
+
 </launch>
