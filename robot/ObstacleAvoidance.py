@@ -75,9 +75,9 @@ def main():
         ########################################################
         #Initialize to suggested velocity in case no corrective action needs to be taken
         newLocationList = deepcopy(locationList)
-	newSugVel = deepcopy(sugVel)
+        newSugVel = deepcopy(sugVel)
 	
-	cmdVel.x = newSugVel.x
+        cmdVel.x = newSugVel.x
         cmdVel.y = newSugVel.y
         foundLocation = False
         
@@ -94,25 +94,82 @@ def main():
             BUFFER = 0.25 # In meters
             robotOnEdge = False
             if location.y < BUFFER or location.x < BUFFER or (newLocationList.width - location.x) < BUFFER or (newLocationList.height - location.y) < BUFFER:
-		robotOnEdge = True
+                robotOnEdge = True
                 goalVelocityMagnitude = 30
                 x = centerX - location.x
                 y = location.y - centerY
                 
                 currentMagnitude = math.sqrt((x*x) + (y*y))
-		print("current mag: " + str(currentMagnitude))
+                print("current mag: " + str(currentMagnitude))
                 magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
-		print("multiplier: " + str(magMultiplier))
+                print("multiplier: " + str(magMultiplier))
                 cmdVel.x = x*magMultiplier
                 cmdVel.y = y*magMultiplier
-		print("vector x: " + str(x) + " vector y: " + str(y))
-		print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
+                print("vector x: " + str(x) + " vector y: " + str(y))
+                print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
                 
             #   3a. If close to edge direct robot to center of frame
             #   3b. If not close to edge pass along suggested movement
             #   4. Determine field of vision where collision may be imenent
+            #Create rectangle
+            W = 0.5 #meters
+            H = 0.25 #meters
+            #x1 = W/2
+            #y1 = 0
+            #x2 = x1
+            #y2 = H
+            #x3 = -1*w/2
+            #y3 = y2
+            #x4 = x3
+            #y4 = 0
+            #x1 = location.x + W/2
+            #y1 = location.y
+            #x2 = x1
+            #y2 = location.y + H
+            #x3 = location.x - w/2
+            #y3 = y2
+            #x4 = x3
+            #y4 = location.y
+            
+            #Create rectangle - polar coordinates
+            r1 = W/2
+            r2 = math.sqrt((W**2)/4+H**2)
+            r3 = r2
+            r4 = -180
+            theta1 = 0
+            theta2 = math.degrees(math.acos((W/2)/r2))
+            theta3 = 180-theta2
+            theta4 = -180
+            
+            #Rotate angle
+            theta1 = theta1 + location.angle
+            theta2 = theta2 + location.angle
+            theta3 = theta3 + location.angle
+            theta4 = theta4 + location.angle
+            
+            #Calculate new x and y
+            #rcostheta
+            x1 = r1*math.cos(math.radians(theta1))
+            y1 = r1*math.sin(math.radians(theta1))
+            A = Point(x1, y1)
+            x2 = r2*math.cos(math.radians(theta2))
+            y2 = r2*math.sin(math.radians(theta2))
+            B = Point(x2, y2)
+            x3 = r3*math.cos(math.radians(theta3))
+            y3 = r3*math.sin(math.radians(theta3))
+            C = Point(x3, y3)
+            x4 = r4*math.cos(math.radians(theta4))
+            y4 = r4*math.sin(math.radians(theta4))
+            D = Point(x4, y4)
+
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
-            #   5b. If no other robots in "field of "vision - pass along suggested movement command 
+            #   5b. If no other robots in "field of "vision - pass along suggested movement command
+            for i in range (0,newLocationList.numRobots):
+            if(newLocationList.robotList[i].robotID != ROBOT_ID):
+                P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
+                if(is_inside(P, A, B, C, D)):
+                    print("Obstacle in sight")
+                break
         else:
             cmdVel.x = 0
             cmdVel.y = 0
@@ -122,8 +179,24 @@ def main():
         ########################################################
         pub.publish(cmdVel)
         
+#class Point has two variables:x and y.
+def vec(A,B): #vector of point A,B
+    return Point(B.x-A.x,B.y-A.y)
 
+def dot(P,Q): #scalar product of two vectors
+    return P.x*Q.x+P.y*Q.y
 
+def is_inside(P,A,B,C,D):#P is the given point,others are 4 vertices 
+    return 0<=dot(vec(A,B),vec(A,P))<=dot(vec(A,B),vec(A,B)) and \
+       0<=dot(vec(B,C),vec(B,M))<=dot(vec(B,C),vec(B,C))
+       
+class Point:
+    """ Point class represents and manipulates x,y coords. """
+
+    def __init__(self, xx, yy):
+        """ Create a new point at the origin """
+        self.x = xx
+        self.y = yy
 
  
 if __name__ == '__main__':
