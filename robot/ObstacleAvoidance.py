@@ -64,6 +64,8 @@ def main():
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
     pub = rospy.Publisher('commanded_movement', RobotVelocity, queue_size=10)
     
+    time.sleep(1)
+
     while not isLocationReady:
         pass
         

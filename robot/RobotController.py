@@ -67,6 +67,8 @@ def main():
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
     pub = rospy.Publisher('robot_commands', WheelSpeeds, queue_size=10)
     
+    time.sleep(1)
+    
     ########################################################
     #Wait here for any data that needs to be ready
     #For data that would crash the program if it was not

@@ -50,6 +50,8 @@ def main():
     
     robot.rightWheel(0)
     robot.leftWheel(0)
+    
+    time.sleep(1)
 	
     #Test printing out robot ID
     #robotInfo = Robot_Info()
