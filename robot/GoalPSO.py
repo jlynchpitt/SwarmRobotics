@@ -60,7 +60,7 @@ vectorX = 0
 vectorY = 0
 
 prevVectorX = 25
-prevVectprY = 25
+prevVectorY = 25
 
 ########################################################
 #Callback functions for each subscriber
