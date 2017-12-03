@@ -23,6 +23,7 @@ import roslib
 import sys
 import rospy
 import math
+import time
 from copy import deepcopy
 from Robot_Info import Robot_Info
 from swarm.msg import RobotVelocity, WheelSpeeds, RobotLocationList, RobotLocation
@@ -166,6 +167,7 @@ def main():
         print("wheel diff: " + str(wheelDiff))
         print("right: " + str(wheelSpeed.rightWheel) + " left: " + str(wheelSpeed.leftWheel))
         pub.publish(wheelSpeed)
+        time.sleep(.075)
  
 if __name__ == '__main__':
         main()

@@ -18,6 +18,7 @@ import roslib
 #roslib.load_manifest('rosopencv')
 import sys
 import rospy
+import time
 import math
 from copy import deepcopy
 from Robot_Info import Robot_Info
@@ -178,6 +179,7 @@ def main():
         #Publish data here
         ########################################################
         pub.publish(cmdVel)
+        time.sleep(0.05)
         
 #class Point has two variables:x and y.
 def vec(A,B): #vector of point A,B

@@ -11,6 +11,7 @@
 ########################################################
 
 import roslib
+import time
 #roslib.load_manifest('rosopencv')
 import sys
 import rospy
@@ -60,6 +61,8 @@ def main():
         ########################################################
         robot.rightWheel(wheelSpeed.rightWheel)
         robot.leftWheel(wheelSpeed.leftWheel)
+        time.sleep(.1)
+        
         
 if __name__ == '__main__':
 	robot
