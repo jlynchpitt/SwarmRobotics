@@ -10,10 +10,19 @@ from sensor_msgs.msg import Image
 from smbus2 import SMBus
 import time
 from swarm.msg import SensorData
+from Robot_Info import Robot_Info
+
+data = SensorData()
+data.robotID = 0
+data.red = 0
+data.green = 0
+data.blue = 0
 
 def main():
     global data
-    data = SensorData()
+    robotInfo = Robot_Info()
+    robID = robotInfo.getRobotID
+    data.robotID = robID
     sensorAddr =  0x44 ##address of the light sensor
     i2c = SMBus(1) ##initialize SMBus object using the bus number
     i2c.write_byte_data(0x44, 1, 0xD) ##configures the temperature sensor

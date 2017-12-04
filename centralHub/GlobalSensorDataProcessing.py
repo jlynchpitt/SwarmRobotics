@@ -79,6 +79,7 @@ def main():
         #Publish data here
         ########################################################
         sensorPub.publish(maxData)
+        time.sleep(1)
         
 
 
