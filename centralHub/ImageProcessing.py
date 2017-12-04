@@ -95,7 +95,7 @@ def main():
         # Find triangles and identify robots
         gray = cv2.cvtColor(color_image_raw, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0) #orig 5x5
-        thresh = cv2.threshold(blur, 65, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.threshold(blur, 50, 255, cv2.THRESH_BINARY)[1] #orig 65
         #thresh = cv2.erode(thresh, None, iterations=2)
         #thresh = cv2.dilate(thresh, None, iterations=2)
         
@@ -163,12 +163,12 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
     area = oLine1 * oLine2 / 2
     lineDiff = 100*math.fabs(oLine1 - oLine2)/oLine2
     
-    print("\nArea: " + str(area) + " line diff: " + str(lineDiff))
+    #print("\nArea: " + str(area) + " line diff: " + str(lineDiff))
     
     #check area + line distances to determine if a robot    
     # expected area = 55.125 cm^2
     maxArea = 70 #cm^2
-    minArea = 40
+    minArea = 30
     allowLineDiff = 20 #% difference allowed between 2 oLines - triangle should be isosceles
     #print("Area: " + str(area) + " lineDIff: " + str(lineDiff))
     
@@ -239,6 +239,49 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         cv2.putText(color_image, locationText, (centerX_pix,centerY_pix+75), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         cv2.putText(color_image, angleText, (centerX_pix,centerY_pix+105), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
         cv2.putText(color_image, str(robot.robotID), (centerX_pix,centerY_pix+135), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+        
+        #Test obstacle detection
+        if True:            
+            Hm = 0.45 #meters
+            Wm = 2*Hm # meters
+            W = Wm / yPixelDist #pixels
+            H = Hm / xPixelDist # pixels
+            r1 = W/2
+            r2 = -1*H
+            #r2 = -1*math.sqrt((W**2)/4+H**2)
+            #r3 = r2
+            r4 = W/2
+            theta1 = 0
+            theta2 = 90
+            #theta2 = math.degrees(math.acos((W/2)/r2))
+            #theta3 = 180-theta2
+            theta4 = 180
+            
+            #Rotate angle
+            theta1 = theta1 - (angle - 90)
+            theta2 = theta2 - (angle - 90)
+            #theta3 = theta3 - (angle - 90)
+            theta4 = theta4 - (angle - 90)
+            
+            #Calculate new x and y
+            #rcostheta
+            x1 = int(r1*math.cos(math.radians(theta1))) + centerX_pix
+            y1 = int(r1*math.sin(math.radians(theta1))) + centerY_pix
+            #A = Point(x1, y1)
+            x2 = int(r2*math.cos(math.radians(theta2))) + centerX_pix
+            y2 = int(r2*math.sin(math.radians(theta2))) + centerY_pix
+            #B = Point(x2, y2)
+            #x3 = int(r3*math.cos(math.radians(theta3))) + centerX_pix
+            #y3 = int(r3*math.sin(math.radians(theta3))) + centerY_pix
+            #C = Point(x3, y3)
+            x4 = int(r4*math.cos(math.radians(theta4))) + centerX_pix
+            y4 = int(r4*math.sin(math.radians(theta4))) + centerY_pix
+            cv2.arrowedLine(color_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+            cv2.line(color_image, (x2, y2), (x4, y4), (255, 0, 0), 2)
+            #cv2.line(color_image, (x2, y2), (x3, y3), (255, 0, 0), 2)
+            #cv2.line(color_image, (x3, y3), (x4, y4), (255, 0, 0), 2)
+            cv2.line(color_image, (x4, y4), (x1, y1), (255, 0, 0), 2)
+
         
         locationList.robotList.append(robot)
         locationList.numRobots = locationList.numRobots + 1
@@ -328,10 +371,10 @@ def classify_triangle_color(image, triangle_center_x, triangle_center_y):
               "blue" : (0,0,255),
               "yellow" : (255,255,0),
               }
-    ids = {"red" : 1,
-              "green" : 2,
-              "blue" : 3,
-              "yellow" : 4,
+    ids = {"red" : 3,
+              "green" : 1,
+              "blue" : 4,
+              "yellow" : 2,
               }
 
     manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2]) 

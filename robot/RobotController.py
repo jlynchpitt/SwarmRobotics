@@ -55,16 +55,30 @@ def updateLocation(data):
     locationList = data
     
 def main():
-    global cmdVel, wheelSpeed, pid, locationList, location
+    global cmdVel, wheelSpeed, pid, locationList, location, ROBOT_ID
     
     ########################################################
     #Initialize the node, any subscribers and any publishers
     #TODO: Change data types of subscribers
     ########################################################
     rospy.init_node('robot_controller_node', anonymous=True)
-    rospy.Subscriber("/commanded_movement", RobotVelocity, updateCommandedMovement, queue_size=10)
+    if ROBOT_ID == 1:
+        rospy.Subscriber("/commanded_movement_1", RobotVelocity, updateCommandedMovement, queue_size=10)
+    elif ROBOT_ID == 2:
+        rospy.Subscriber("/commanded_movement_2", RobotVelocity, updateCommandedMovement, queue_size=10)
+    elif ROBOT_ID == 3:
+        rospy.Subscriber("/commanded_movement_3", RobotVelocity, updateCommandedMovement, queue_size=10)
+    elif ROBOT_ID == 4:
+        rospy.Subscriber("/commanded_movement_4", RobotVelocity, updateCommandedMovement, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
-    pub = rospy.Publisher('robot_commands', WheelSpeeds, queue_size=10)
+    if ROBOT_ID == 1:
+        pub = rospy.Publisher('robot_commands_1', WheelSpeeds, queue_size=10)
+    if ROBOT_ID == 2:
+        pub = rospy.Publisher('robot_commands_2', WheelSpeeds, queue_size=10)
+    if ROBOT_ID == 3:
+        pub = rospy.Publisher('robot_commands_3', WheelSpeeds, queue_size=10)
+    if ROBOT_ID == 4:
+        pub = rospy.Publisher('robot_commands_4', WheelSpeeds, queue_size=10)
     
     ########################################################
     #Wait here for any data that needs to be ready

@@ -35,7 +35,7 @@ isLocationReady = False
 
 robotInfo = Robot_Info()
 ROBOT_ID = robotInfo.getRobotID()
-print(ROBOT_ID)
+
 ########################################################
 #Callback functions for each subscriber
 #   + any other custom functions needed
@@ -53,15 +53,29 @@ def updateLocation(data):
     isLocationReady = True
 
 def main():
-    global sugVel, cmdVel, locationList, location, isLocationReady
+    global sugVel, cmdVel, locationList, location, isLocationReady, ROBOT_ID
     
     ########################################################
     #Initialize the node, any subscribers and any publishers
     ########################################################
     rospy.init_node('obstacle_avoidance_node', anonymous=True)
-    rospy.Subscriber("/suggested_movement", RobotVelocity, updateSuggestedMovement, queue_size=10)
+    if ROBOT_ID == 1:
+        rospy.Subscriber("/suggested_movement_1", RobotVelocity, updateSuggestedMovement, queue_size=10)
+    elif ROBOT_ID == 2:
+        rospy.Subscriber("/suggested_movement_2", RobotVelocity, updateSuggestedMovement, queue_size=10)
+    elif ROBOT_ID == 3:
+        rospy.Subscriber("/suggested_movement_3", RobotVelocity, updateSuggestedMovement, queue_size=10)
+    elif ROBOT_ID == 4:
+        rospy.Subscriber("/suggested_movement_4", RobotVelocity, updateSuggestedMovement, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
-    pub = rospy.Publisher('commanded_movement', RobotVelocity, queue_size=10)
+    if ROBOT_ID == 1:
+        pub = rospy.Publisher('commanded_movement_1', RobotVelocity, queue_size=10)
+    elif ROBOT_ID == 2:
+        pub = rospy.Publisher('commanded_movement_2', RobotVelocity, queue_size=10)
+    elif ROBOT_ID == 3:
+        pub = rospy.Publisher('commanded_movement_3', RobotVelocity, queue_size=10)
+    elif ROBOT_ID == 4:
+        pub = rospy.Publisher('commanded_movement_4', RobotVelocity, queue_size=10)
     
     while not isLocationReady:
         pass
@@ -112,8 +126,8 @@ def main():
             #   3b. If not close to edge pass along suggested movement
             #   4. Determine field of vision where collision may be imenent
             #Create rectangle
-            W = 0.5 #meters
-            H = 0.25 #meters
+            H = 0.45 #meters
+            W = 2*H # meters
             #x1 = W/2
             #y1 = 0
             #x2 = x1

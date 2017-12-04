@@ -24,8 +24,8 @@ IFS=$'\n\t'
 ## Config
 robots=$1
 remote_launchfile_path='~/catkin_ws/src/swarm/launch/fromlaunchscript.launch'
-uri="http://$(hostname):11311/"
-
+# uri="http://$(hostname):11311/"  
+uri="http://$(ifconfig | grep -A 1 'wlp4s0' | tail -1 | cut -d ':' -f 2 | cut -d ' ' -f 1):11311/"
 # create a temp file to later build the launchfile
 launchfile=$(mktemp)
 function cleantemp { 
@@ -44,7 +44,7 @@ nohup roscore &
 
 # ssh "export master uri; ./startrobot$i"
 # for (( i=1; i<=$robots; i++ )) # uncomment for sequential launch
-for i in 3 4   # uncomment for list of robots for testing
+for i in 4 3   # uncomment for list of robots for testing
 do
 	echo "r$i"
 
@@ -96,12 +96,12 @@ do
 END
 
 #  scp $launchfile pi@pi-desktop:$remote_launchfile_path #uncomment for testing
-  scp $launchfile r$i:$remote_launchfile_path # uncomment for demo
+  scp $launchfile pi@r$i:$remote_launchfile_path # uncomment for demo
 
   # connect to robot r$i; set env vars; run roslaunch
 
 #  ssh pi@pi-desktop << END # uncomment for testing
-  ssh r$i << END # unomment for demo
+  ssh pi@r$i << END # unomment for demo
     # set environment vars
     echo "export ROS_MASTER_URI=$uri" > .bash_profile
     echo "export ROS_HOSTNAME=r$i" >> .bash_profile
