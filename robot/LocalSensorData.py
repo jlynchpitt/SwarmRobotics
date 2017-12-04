@@ -38,7 +38,7 @@ def main():
         pub = rospy.Publisher('local_sensor_data_2', SensorData, queue_size=10)
     elif(robID == 3):
         pub = rospy.Publisher('local_sensor_data_3', SensorData, queue_size=10)
-    else
+    else:
         pub = rospy.Publisher('local_sensor_data_4', SensorData, queue_size=10)
     time.sleep(1)
 	
