@@ -13,11 +13,11 @@ import os.path
 
 class Robot_Info:
 	def getRobotID(self):
-		if os.path.exists('1.txt') == True:
+		if os.path.exists('/home/pi/catkin_ws/src/swarm/robot/1.txt') == True:
 			return 1
-		elif os.path.exists('2.txt') == True:
+		elif os.path.exists('/home/pi/catkin_ws/src/swarm/robot/2.txt') == True:
 			return 2
-		elif os.path.exists('3.txt') == True:
+		elif os.path.exists('/home/pi/catkin_ws/src/swarm/robot/3.txt') == True:
 			return 3
 		else:
 			return 4
