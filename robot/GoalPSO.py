@@ -100,7 +100,7 @@ def main():
     elif(robID == 3):
         pub = rospy.Publisher('suggested_movement_3', RobotVelocity, queue_size=10)
     else:
-        pub = rospy.Publisher('suggested_movement_4', RobotVelociy, queue_size=10)
+        pub = rospy.Publisher('suggested_movement_4', RobotVelocity, queue_size=10)
     time.sleep(1)
 	
 	########################################################
