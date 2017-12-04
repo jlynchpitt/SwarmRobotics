@@ -21,11 +21,11 @@ data.blue = 0
 def main():
     global data
     robotInfo = Robot_Info()
-    robID = robotInfo.getRobotID
+    robID = robotInfo.getRobotID()
     data.robotID = robID
     sensorAddr =  0x44 ##address of the light sensor
     i2c = SMBus(1) ##initialize SMBus object using the bus number
-    i2c.write_byte_data(0x44, 1, 0xD) ##configures the temperature sensor
+    i2c.write_byte_data(0x44, 1, 0xD) ##configures the light sensor
     
 	########################################################
 	#Initialize the node, any subscribers and any publishers
@@ -69,6 +69,5 @@ def main():
         time.sleep(1)
 
 
- 
 if __name__ == '__main__':
         main()
