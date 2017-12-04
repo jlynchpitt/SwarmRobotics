@@ -84,6 +84,8 @@ def updateLocationList(data):
 
 def main():
     global prevVectorX, prevVectorY, vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
+    robotInfo = Robot_Info()
+    robID = robotInfo.getRobotID()
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -91,7 +93,14 @@ def main():
     rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
-    pub = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
+    if(robID == 1):
+        pub = rospy.Publisher('suggested_movement_1', RobotVelocity, queue_size=10)
+    elif(robID == 2):
+        pub = rospy.Publisher('suggested_movement_2', RobotVelocity, queue_size=10)
+    elif(robID == 3):
+        pub = rospy.Publisher('suggested_movement_3', RobotVelocity, queue_size=10)
+    else
+        pub = rospy.Publisher('suggested_movement_4', RobotVelociy, queue_size=10)
     time.sleep(1)
 	
 	########################################################
@@ -100,8 +109,6 @@ def main():
 	#	ready yet
 	########################################################
     tempList = deepcopy(theList)
-    robotInfo = Robot_Info()
-    robID = robotInfo.getRobotID
 
     while not rospy.is_shutdown():
 

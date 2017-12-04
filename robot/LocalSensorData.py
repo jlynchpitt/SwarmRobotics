@@ -32,7 +32,14 @@ def main():
 	#Note no subscribers needed for this node
 	########################################################
     rospy.init_node('local_sensor_data_node', anonymous=True)
-    pub = rospy.Publisher('local_sensor_data', SensorData, queue_size=10)
+    if(robID == 1):
+        pub = rospy.Publisher('local_sensor_data_1', SensorData, queue_size=10)
+    elif(robID == 2):
+        pub = rospy.Publisher('local_sensor_data_2', SensorData, queue_size=10)
+    elif(robID == 3):
+        pub = rospy.Publisher('local_sensor_data_3', SensorData, queue_size=10)
+    else
+        pub = rospy.Publisher('local_sensor_data_4', SensorData, queue_size=10)
     time.sleep(1)
 	
 	########################################################
