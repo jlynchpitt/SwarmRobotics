@@ -16,11 +16,29 @@ currentGreen = 0
 currentBlue = 0
 currentMax = 0
 
-theData = SensorData()
-theData.robotID = 1
-theData.red = 0
-theData.green = 0
-theData.blue = 0
+theData1 = SensorData()
+theData1.robotID = 1
+theData1.red = 0
+theData1.green = 0
+theData1.blue = 0
+
+theData2 = SensorData()
+theData2.robotID = 2
+theData2.red = 0
+theData2.green = 0
+theData2.blue = 0
+
+theData3 = SensorData()
+theData3.robotID = 3
+theData3.red = 0
+theData3.green = 0
+theData3.blue = 0
+
+theData4 = SensorData()
+theData4.robotID = 4
+theData4.red = 0
+theData4.green = 0
+theData4.blue = 0
 
 maxData = SensorData()
 maxData.robotID = 1
