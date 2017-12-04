@@ -69,16 +69,16 @@ def main():
         rospy.Subscriber("/commanded_movement_2", RobotVelocity, updateCommandedMovement, queue_size=10)
     elif ROBOT_ID == 3:
         rospy.Subscriber("/commanded_movement_3", RobotVelocity, updateCommandedMovement, queue_size=10)
-    elif ROBOT_ID == 4:
+    else:
         rospy.Subscriber("/commanded_movement_4", RobotVelocity, updateCommandedMovement, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocation, queue_size=10)
     if ROBOT_ID == 1:
         pub = rospy.Publisher('robot_commands_1', WheelSpeeds, queue_size=10)
-    if ROBOT_ID == 2:
+    elif ROBOT_ID == 2:
         pub = rospy.Publisher('robot_commands_2', WheelSpeeds, queue_size=10)
-    if ROBOT_ID == 3:
+    elif ROBOT_ID == 3:
         pub = rospy.Publisher('robot_commands_3', WheelSpeeds, queue_size=10)
-    if ROBOT_ID == 4:
+    else:
         pub = rospy.Publisher('robot_commands_4', WheelSpeeds, queue_size=10)
     
     time.sleep(1)
@@ -178,10 +178,23 @@ def main():
         #vMagnitude = 0 #TODO: This is temporary for testing
         
         # 5. Publish calculated wheel speeds
-        wheelSpeed.rightWheel = vMagnitude + wheelDiff * multiplier * -1
-        wheelSpeed.leftWheel = vMagnitude + wheelDiff * multiplier
-        print("wheel diff: " + str(wheelDiff))
-        print("right: " + str(wheelSpeed.rightWheel) + " left: " + str(wheelSpeed.leftWheel))
+        newRightWheel = vMagnitude + wheelDiff * multiplier * -1
+        newLeftWheel = vMagnitude + wheelDiff * multiplier
+        
+        if newRightWheel > 100:
+            newRightWheel = 100
+        elif newRightWheel < -100:
+            newRightWheel = -100
+        
+        if newLeftWheel > 100:
+            newLeftWheel = 100
+        elif newLeftWheel < -100:
+            newLeftWheel = -100
+        
+        wheelSpeed.rightWheel = newRightWheel
+        wheelSpeed.leftWheel = newLeftWheel
+        #print("wheel diff: " + str(wheelDiff))
+        #print("right: " + str(wheelSpeed.rightWheel) + " left: " + str(wheelSpeed.leftWheel))
         pub.publish(wheelSpeed)
         time.sleep(.075)
  
