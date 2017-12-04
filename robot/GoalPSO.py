@@ -5,6 +5,7 @@ import sys
 import rospy
 import math
 import random
+import time
 from copy import deepcopy
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
@@ -56,8 +57,11 @@ localMaxPos.x = 0
 localMaxPos.y = 0
 localMaxPos.angle = 0
 
-vectorX = 25
-vectorY = 25
+vectorX = 0
+vectorY = 0
+
+prevVectorX = 25
+prevVectorY = 25
 
 ########################################################
 #Callback functions for each subscriber
@@ -79,7 +83,7 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVel
+    global prevVectorX, prevVectorY, vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -88,6 +92,7 @@ def main():
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
     pub = rospy.Publisher('suggested_movement', RobotVelocity, queue_size=10)
+    time.sleep(1)
 	
 	########################################################
 	#Wait here for any data that needs to be ready
@@ -97,9 +102,6 @@ def main():
     tempList = deepcopy(theList)
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID
-    print(robID)
-    print(currentData.red)
-    print(theData.red)
 
     while not rospy.is_shutdown():
 
@@ -118,13 +120,21 @@ def main():
             localMaxData = currentData
             localMaxPos = currentLocation
 
-        if(theData.red < 2500): ##case where the global max threshold has not been met, keep searching
-            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (targetLocation.x - localMaxPos.x))
-            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (targetLocation.y - localMaxPos.y))
-        elif(theData.red > 2500 and currentData.red < 2500): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = vectorX + 2 * random.random() * (targetLocation.x - currentLocation.x) + 2 * random.random() * (targetLocation.x - localMaxPos.x)
-            vectorY = vectorY + 2 * random.random() * (targetLocation.y - currentLocation.y) + 2 * random.random() * (targetLocation.y - localMaxPos.y)
-        elif(theData.red > 2500 and currentData.red > 2500): ##case where the robot is near the global max threshold, stop it
+        if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
+            vectorX = prevVectorX
+            vectorY = prevVectorY
+            vectorX = vectorX + (10 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
+            vectorY = vectorY + (10 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
+            prevVectorX = vectorX
+            prevVectorY = vectorY
+        elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
+            vectorX = prevVectorX
+            vectorY = prevVectorY
+            vectorX = vectorX + (10 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
+            vectorY = vectorY + (10 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
+            prevVectorX = vectorX
+            prevVectorY = vectorY
+        elif(theData.red > 1000 and currentData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 

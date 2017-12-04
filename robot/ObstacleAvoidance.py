@@ -18,6 +18,7 @@ import roslib
 #roslib.load_manifest('rosopencv')
 import sys
 import rospy
+import time
 import math
 from copy import deepcopy
 from Robot_Info import Robot_Info
@@ -77,6 +78,8 @@ def main():
     elif ROBOT_ID == 4:
         pub = rospy.Publisher('commanded_movement_4', RobotVelocity, queue_size=10)
     
+    time.sleep(1)
+
     while not isLocationReady:
         pass
         
@@ -179,11 +182,11 @@ def main():
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
             #   5b. If no other robots in "field of "vision - pass along suggested movement command
             for i in range (0,newLocationList.numRobots):
-            if(newLocationList.robotList[i].robotID != ROBOT_ID):
-                P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
-                if(is_inside(P, A, B, C, D)):
-                    print("Obstacle in sight")
-                break
+                if(newLocationList.robotList[i].robotID != ROBOT_ID):
+                    P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
+                    if(is_inside(P, A, B, C, D)):
+                        print("Obstacle in sight")
+                    break
         else:
             cmdVel.x = 0
             cmdVel.y = 0
@@ -192,6 +195,7 @@ def main():
         #Publish data here
         ########################################################
         pub.publish(cmdVel)
+        time.sleep(0.05)
         
 #class Point has two variables:x and y.
 def vec(A,B): #vector of point A,B
@@ -200,9 +204,9 @@ def vec(A,B): #vector of point A,B
 def dot(P,Q): #scalar product of two vectors
     return P.x*Q.x+P.y*Q.y
 
-def is_inside(P,A,B,C,D):#P is the given point,others are 4 vertices 
+def is_inside(P,A,B,C,D): #P is the given point,others are 4 vertices 
     return 0<=dot(vec(A,B),vec(A,P))<=dot(vec(A,B),vec(A,B)) and \
-       0<=dot(vec(B,C),vec(B,M))<=dot(vec(B,C),vec(B,C))
+       0<=dot(vec(B,C),vec(B,P))<=dot(vec(B,C),vec(B,C))
        
 class Point:
     """ Point class represents and manipulates x,y coords. """

@@ -4,6 +4,7 @@ import roslib
 import sys
 import rospy
 import math
+import time
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from collections import deque
@@ -56,6 +57,7 @@ def main():
     rospy.init_node('global_sensor_data_processing_node', anonymous=True)
     rospy.Subscriber("/local_sensor_data", SensorData, updateSensorData, queue_size=10)
     sensorPub = rospy.Publisher('global_sensor_data', SensorData, queue_size=10)
+    time.sleep(1)
     
     ########################################################
     #Wait here for any data that needs to be ready
@@ -77,6 +79,7 @@ def main():
         #Publish data here
         ########################################################
         sensorPub.publish(maxData)
+        time.sleep(1)
         
 
 
