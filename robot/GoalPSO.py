@@ -19,18 +19,8 @@ cmdVel.y = 25
 theList = RobotLocationList()
 
 targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
-targetLocation.robotID = 1
-targetLocation.robotColor = ""
-targetLocation.x = 0
-targetLocation.y = 0
-targetLocation.angle = 0
 
 currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
-currentLocation.robotID = 1
-currentLocation.robotColor = ""
-currentLocation.x = 0
-currentLocation.y = 0
-currentLocation.angle = 0
 
 theData = SensorData() ##theData: SensorData() of the global data
 theData.robotID = 1
@@ -130,23 +120,32 @@ def main():
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
             vectorX = prevVectorX
             vectorY = prevVectorY
-            vectorX = vectorX + (10 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (10 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
+            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
             prevVectorX = vectorX
             prevVectorY = vectorY
         elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
             vectorX = prevVectorX
             vectorY = prevVectorY
-            vectorX = vectorX + (10 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (10 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
+            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
             prevVectorX = vectorX
             prevVectorY = vectorY
         elif(theData.red > 1000 and currentData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 
-        cmdVel.x = vectorX
-        cmdVel.y = vectorY
+        cmdVel.x = int(vectorX)
+        cmdVel.y = int(vectorY)
+
+        if(cmdVel.x > 75):
+            cmdVel.x = 75
+        if(cmdVel.y > 75):
+            cmdVel.y = 75
+        if(cmdVel.x < -75):
+            cmdVel.x = -75
+        if(cmdVel.y < -75):
+            cmdVel.y = -75
 		
 		########################################################
 		#Publish data here
