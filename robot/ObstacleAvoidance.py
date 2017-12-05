@@ -143,21 +143,21 @@ def main():
             theta4 = 180
             
             #Rotate angle
-            theta1 = theta1 - (angle - 90)
-            theta2 = theta2 - (angle - 90)
+            theta1 = theta1 - (location.angle - 90)
+            theta2 = theta2 - (location.angle - 90)
             #theta3 = theta3 - (angle - 90)
-            theta4 = theta4 - (angle - 90)
+            theta4 = theta4 - (location.angle - 90)
             
             #Calculate new x and y
             #rcostheta
-            x1 = int(r1*math.cos(math.radians(theta1))) + centerX_pix
-            y1 = int(r1*math.sin(math.radians(theta1))) + centerY_pix
+            x1 = int(r1*math.cos(math.radians(theta1))) + location.x
+            y1 = int(r1*math.sin(math.radians(theta1))) + location.y
             A = Point(x1, y1)
-            x2 = int(r2*math.cos(math.radians(theta2))) + centerX_pix
-            y2 = int(r2*math.sin(math.radians(theta2))) + centerY_pix
+            x2 = int(r2*math.cos(math.radians(theta2))) + location.x
+            y2 = int(r2*math.sin(math.radians(theta2))) + location.y
             B = Point(x2, y2)
-            x3 = int(r4*math.cos(math.radians(theta4))) + centerX_pix
-            y3 = int(r4*math.sin(math.radians(theta4))) + centerY_pix
+            x3 = int(r4*math.cos(math.radians(theta4))) + location.x
+            y3 = int(r4*math.sin(math.radians(theta4))) + location.y
             C = Point(x3, y3)
 
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
@@ -165,7 +165,7 @@ def main():
             for i in range (0,newLocationList.numRobots):
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
-                    print("Checking robot: " + newLocationList.robotList[i].robotID
+                    print("Checking robot: " + str(newLocationList.robotList[i].robotID))
                     if(is_inside(P, A, B, C)):
                         print("Obstacle in sight")
                     break
