@@ -51,12 +51,10 @@ do
   # build roslaunch file
   cat <<END > $launchfile 
   <launch>
-      <remap from="/commanded_movement" to="r$i/commanded_movement" />
-      <remap from="/suggested_movement" to="r$i/suggested_movement" />
       <node
           pkg="swarm"
           type="RobotNode.py"
-          name="robot_node"
+          name="robot_node_$i"
           respawn="true"
       >
       </node> 
@@ -64,7 +62,7 @@ do
       <node
           pkg="swarm"
           type="RobotController.py"
-          name="robot_controller"
+          name="robot_controller_$i"
           respawn="true"
       >
       </node>
@@ -72,7 +70,7 @@ do
       <node
           pkg="swarm"
           type="ObstacleAvoidance.py"
-          name="robot_avoidance"
+          name="robot_avoidance_$i"
           respawn="true"
       >
       </node>
@@ -80,7 +78,7 @@ do
       <node
           pkg="swarm"
           type="GoalPSO.py"
-          name="goal_pso"
+          name="goal_pso_$i"
           respawn="true"
       >
       </node>
@@ -88,7 +86,7 @@ do
       <node
           pkg="swarm"
           type="LocalSensorData.py"
-          name="local_sensor_data"
+          name="local_sensor_data_$i"
           respawn="true"
       >
       </node>
