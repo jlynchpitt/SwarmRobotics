@@ -189,6 +189,16 @@ def dot(P,Q): #scalar product of two vectors
 def is_inside(P,A,B,C): #P is the given point,others are 4 vertices 
     return 0<=dot(vec(A,B),vec(A,P))<=dot(vec(A,B),vec(A,B)) and \
        0<=dot(vec(B,C),vec(B,P))<=dot(vec(B,C),vec(B,C))
+    
+def sign(p1, p2, p3):
+    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
+
+def PointInTriangle(pt, v1, v2, v3):
+    b1 = sign(pt, v1, v2) < float(0.0)
+    b2 = sign(pt, v2, v3) < float(0.0)
+    b3 = sign(pt, v3, v1) < float(0.0)
+
+    return ((b1 == b2) && (b2 == b3))
        
 class Point:
     """ Point class represents and manipulates x,y coords. """
