@@ -94,8 +94,12 @@ def main():
         
         # Find triangles and identify robots
         gray = cv2.cvtColor(color_image_raw, cv2.COLOR_BGR2GRAY)
+        #gray = cv2.cvtColor(color_image_raw, cv2.COLOR_HSV2GRAY)
         blur = cv2.GaussianBlur(gray, (5, 5), 0) #orig 5x5
-        thresh = cv2.threshold(blur, 50, 255, cv2.THRESH_BINARY)[1] #orig 65
+        thresh = cv2.threshold(blur, 77, 255, cv2.THRESH_BINARY)[1] #orig 65
+        #ret3,thresh = cv2.threshold(gray,80,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        #thresh = cv2.adaptiveThreshold(blur,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
+        #    cv2.THRESH_BINARY,11,2)
         #thresh = cv2.erode(thresh, None, iterations=2)
         #thresh = cv2.dilate(thresh, None, iterations=2)
         
@@ -243,7 +247,7 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         #Test obstacle detection
         if True:            
             Hm = 0.45 #meters
-            Wm = 2*Hm # meters
+            Wm = 1.5*Hm # meters
             W = Wm / yPixelDist #pixels
             H = Hm / xPixelDist # pixels
             r1 = W/2
@@ -371,10 +375,10 @@ def classify_triangle_color(image, triangle_center_x, triangle_center_y):
               "blue" : (0,0,255),
               "yellow" : (255,255,0),
               }
-    ids = {"red" : 3,
+    ids = {"yellow" : 3,
               "green" : 1,
-              "blue" : 4,
-              "yellow" : 2,
+              "red" : 4,
+              "blue" : 2,
               }
 
     manhattan = lambda x,y : abs(x[0] - y[0]) + abs(x[1] - y[1]) + abs(x[2] - y[2]) 

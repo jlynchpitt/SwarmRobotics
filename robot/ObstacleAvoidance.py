@@ -130,61 +130,43 @@ def main():
             #   4. Determine field of vision where collision may be imenent
             #Create rectangle
             H = 0.45 #meters
-            W = 2*H # meters
-            #x1 = W/2
-            #y1 = 0
-            #x2 = x1
-            #y2 = H
-            #x3 = -1*w/2
-            #y3 = y2
-            #x4 = x3
-            #y4 = 0
-            #x1 = location.x + W/2
-            #y1 = location.y
-            #x2 = x1
-            #y2 = location.y + H
-            #x3 = location.x - w/2
-            #y3 = y2
-            #x4 = x3
-            #y4 = location.y
-            
-            #Create rectangle - polar coordinates
+            W = 1.5*H # meters
             r1 = W/2
-            r2 = math.sqrt((W**2)/4+H**2)
-            r3 = r2
-            r4 = -180
+            r2 = -1*H
+            #r2 = -1*math.sqrt((W**2)/4+H**2)
+            #r3 = r2
+            r4 = W/2
             theta1 = 0
-            theta2 = math.degrees(math.acos((W/2)/r2))
-            theta3 = 180-theta2
-            theta4 = -180
+            theta2 = 90
+            #theta2 = math.degrees(math.acos((W/2)/r2))
+            #theta3 = 180-theta2
+            theta4 = 180
             
             #Rotate angle
-            theta1 = theta1 + location.angle
-            theta2 = theta2 + location.angle
-            theta3 = theta3 + location.angle
-            theta4 = theta4 + location.angle
+            theta1 = theta1 - (angle - 90)
+            theta2 = theta2 - (angle - 90)
+            #theta3 = theta3 - (angle - 90)
+            theta4 = theta4 - (angle - 90)
             
             #Calculate new x and y
             #rcostheta
-            x1 = r1*math.cos(math.radians(theta1))
-            y1 = r1*math.sin(math.radians(theta1))
+            x1 = int(r1*math.cos(math.radians(theta1))) + centerX_pix
+            y1 = int(r1*math.sin(math.radians(theta1))) + centerY_pix
             A = Point(x1, y1)
-            x2 = r2*math.cos(math.radians(theta2))
-            y2 = r2*math.sin(math.radians(theta2))
+            x2 = int(r2*math.cos(math.radians(theta2))) + centerX_pix
+            y2 = int(r2*math.sin(math.radians(theta2))) + centerY_pix
             B = Point(x2, y2)
-            x3 = r3*math.cos(math.radians(theta3))
-            y3 = r3*math.sin(math.radians(theta3))
+            x3 = int(r4*math.cos(math.radians(theta4))) + centerX_pix
+            y3 = int(r4*math.sin(math.radians(theta4))) + centerY_pix
             C = Point(x3, y3)
-            x4 = r4*math.cos(math.radians(theta4))
-            y4 = r4*math.sin(math.radians(theta4))
-            D = Point(x4, y4)
 
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
             #   5b. If no other robots in "field of "vision - pass along suggested movement command
             for i in range (0,newLocationList.numRobots):
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
-                    if(is_inside(P, A, B, C, D)):
+                    print("Checking robot: " + newLocationList.robotList[i].robotID
+                    if(is_inside(P, A, B, C)):
                         print("Obstacle in sight")
                     break
         else:
@@ -204,7 +186,7 @@ def vec(A,B): #vector of point A,B
 def dot(P,Q): #scalar product of two vectors
     return P.x*Q.x+P.y*Q.y
 
-def is_inside(P,A,B,C,D): #P is the given point,others are 4 vertices 
+def is_inside(P,A,B,C): #P is the given point,others are 4 vertices 
     return 0<=dot(vec(A,B),vec(A,P))<=dot(vec(A,B),vec(A,B)) and \
        0<=dot(vec(B,C),vec(B,P))<=dot(vec(B,C),vec(B,C))
        
