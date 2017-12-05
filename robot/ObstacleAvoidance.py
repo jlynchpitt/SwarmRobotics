@@ -198,7 +198,7 @@ def PointInTriangle(pt, v1, v2, v3):
     b2 = sign(pt, v2, v3) < float(0.0)
     b3 = sign(pt, v3, v1) < float(0.0)
 
-    return ((b1 == b2) && (b2 == b3))
+    return ((b1 == b2) and (b2 == b3))
        
 class Point:
     """ Point class represents and manipulates x,y coords. """
