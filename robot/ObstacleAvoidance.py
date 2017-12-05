@@ -166,7 +166,7 @@ def main():
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
                     print("Checking robot: " + str(newLocationList.robotList[i].robotID))
-                    if(is_inside(P, A, B, C)):
+                    if(PointInTriangle(P, A, B, C)):
                         print("Obstacle in sight")
                     break
         else:
