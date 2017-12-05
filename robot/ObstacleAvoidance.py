@@ -96,6 +96,7 @@ def main():
 	
         cmdVel.x = newSugVel.x
         cmdVel.y = newSugVel.y
+        cmdVel.obstacle = False
         foundLocation = False
         
         #   1. Read in current robot actual angle from location data
@@ -169,6 +170,7 @@ def main():
                     print("Checking robot: " + str(newLocationList.robotList[i].robotID))
                     if(PointInTriangleBT(P, A, B, C) == True):
                         print("Obstacle in sight")
+                        cmdVel.obstacle = True
                     break
         else:
             cmdVel.x = 0
@@ -180,28 +182,11 @@ def main():
         pub.publish(cmdVel)
         time.sleep(0.05)
         
-#class Point has two variables:x and y.
-def vec(A,B): #vector of point A,B
-    return Point(B.x-A.x,B.y-A.y)
 
 def dot(P,Q): #scalar product of two vectors
     return P.x*Q.x+P.y*Q.y
 
-def is_inside(P,A,B,C): #P is the given point,others are 4 vertices 
-    return 0<=dot(vec(A,B),vec(A,P))<=dot(vec(A,B),vec(A,B)) and \
-       0<=dot(vec(B,C),vec(B,P))<=dot(vec(B,C),vec(B,C))
-    
-def sign(p1, p2, p3):
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y)
-
-def PointInTriangle(pt, v1, v2, v3):
-    b1 = sign(pt, v1, v2) < float(0.0)
-    b2 = sign(pt, v2, v3) < float(0.0)
-    b3 = sign(pt, v3, v1) < float(0.0)
-
-    return ((b1 == b2) and (b2 == b3))
-
-def PointInTriangleBT(P, A, B, C):
+def PointInTriangle(P, A, B, C):
     #print("P x: " + str(P.x) + " y: " + str(P.y))
     #print("A x: " + str(A.x) + " y: " + str(A.y))
     #print("B x: " + str(B.x) + " y: " + str(B.y))
