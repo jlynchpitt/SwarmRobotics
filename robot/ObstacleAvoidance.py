@@ -131,11 +131,11 @@ def main():
             #Create rectangle
             H = 0.45 #meters
             W = 1.5*H # meters
-            r1 = W/2
+            r1 = float(W)/2
             r2 = -1*H
             #r2 = -1*math.sqrt((W**2)/4+H**2)
             #r3 = r2
-            r4 = W/2
+            r4 = float(W)/2
             theta1 = 0
             theta2 = 90
             #theta2 = math.degrees(math.acos((W/2)/r2))
@@ -147,17 +147,18 @@ def main():
             theta2 = theta2 - (location.angle - 90)
             #theta3 = theta3 - (angle - 90)
             theta4 = theta4 - (location.angle - 90)
-            
+            #print("r1: " + str(r1) + " r2: " + str(r2) + " r4: " + str(r4))
+            #print("theta 1: " +str(theta1)+ " 2: " + str(theta2) + " 3: " + str(theta4))
             #Calculate new x and y
             #rcostheta
-            x1 = int(r1*math.cos(math.radians(theta1))) + location.x
-            y1 = int(r1*math.sin(math.radians(theta1))) + location.y
+            x1 = r1*math.cos(math.radians(theta1)) + location.x
+            y1 = r1*math.sin(math.radians(theta1)) + location.y
             A = Point(x1, y1)
-            x2 = int(r2*math.cos(math.radians(theta2))) + location.x
-            y2 = int(r2*math.sin(math.radians(theta2))) + location.y
+            x2 = r2*math.cos(math.radians(theta2)) + location.x
+            y2 = r2*math.sin(math.radians(theta2)) + location.y
             B = Point(x2, y2)
-            x3 = int(r4*math.cos(math.radians(theta4))) + location.x
-            y3 = int(r4*math.sin(math.radians(theta4))) + location.y
+            x3 = r4*math.cos(math.radians(theta4)) + location.x
+            y3 = r4*math.sin(math.radians(theta4)) + location.y
             C = Point(x3, y3)
 
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
@@ -201,10 +202,10 @@ def PointInTriangle(pt, v1, v2, v3):
     return ((b1 == b2) and (b2 == b3))
 
 def PointInTriangleBT(P, A, B, C):
-    print("P x: " + str(P.x) + " y: " + str(P.y))
-    print("A x: " + str(A.x) + " y: " + str(A.y))
-    print("B x: " + str(B.x) + " y: " + str(B.y))
-    print("C x: " + str(C.x) + " y: " + str(C.y))
+    #print("P x: " + str(P.x) + " y: " + str(P.y))
+    #print("A x: " + str(A.x) + " y: " + str(A.y))
+    #print("B x: " + str(B.x) + " y: " + str(B.y))
+    #print("C x: " + str(C.x) + " y: " + str(C.y))
     v0 = Point(C.x - A.x, C.y - A.y)
     v1 = Point(B.x - A.x, B.y - A.y)
     v2 = Point(P.x - A.x, P.y - A.y)
