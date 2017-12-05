@@ -109,7 +109,7 @@ def main():
         
         #   2. Determine if robot close to edge of frame
         if(foundLocation == True):
-            BUFFER = 0.25 # In meters
+            BUFFER = 0.3 # In meters
             robotOnEdge = False
             if location.y < BUFFER or location.x < BUFFER or (newLocationList.width - location.x) < BUFFER or (newLocationList.height - location.y) < BUFFER:
                 robotOnEdge = True
@@ -130,18 +130,18 @@ def main():
             #   3b. If not close to edge pass along suggested movement
             #   4. Determine field of vision where collision may be imenent
             #Create rectangle
-            H = 0.45 #meters
-            W = 1.5*H # meters
+            H = 0.75 #meters
+            W = 0.75 # meters
             r1 = float(W)/2
             r2 = -1*H
             #r2 = -1*math.sqrt((W**2)/4+H**2)
             #r3 = r2
             r4 = float(W)/2
-            theta1 = 0
+            theta1 = 15
             theta2 = 90
             #theta2 = math.degrees(math.acos((W/2)/r2))
             #theta3 = 180-theta2
-            theta4 = 180
+            theta4 = 165
             
             #Rotate angle
             theta1 = theta1 - (location.angle - 90)
@@ -168,7 +168,7 @@ def main():
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
                     print("Checking robot: " + str(newLocationList.robotList[i].robotID))
-                    if(PointInTriangleBT(P, A, B, C) == True):
+                    if(PointInTriangle(P, A, B, C) == True):
                         print("Obstacle in sight")
                         cmdVel.obstacle = True
                     break

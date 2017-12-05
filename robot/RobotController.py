@@ -176,7 +176,7 @@ def main():
         else: #Obstacle - no forward motion just turn
             clockWise = True
             vMagnitude = 0
-            wheelDiff = 9
+            wheelDiff = 20
 
         # clockwise increase left wheel speed
         # counterclockwise - increase right wheel speed
