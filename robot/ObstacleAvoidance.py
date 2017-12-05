@@ -201,6 +201,10 @@ def PointInTriangle(pt, v1, v2, v3):
     return ((b1 == b2) and (b2 == b3))
 
 def PointInTriangleBT(P, A, B, C):
+    print("P x: " + str(P.x) + " y: " + str(P.y))
+    print("A x: " + str(A.x) + " y: " + str(A.y))
+    print("B x: " + str(B.x) + " y: " + str(B.y))
+    print("C x: " + str(C.x) + " y: " + str(C.y))
     v0 = Point(C.x - A.x, C.y - A.y)
     v1 = Point(B.x - A.x, B.y - A.y)
     v2 = Point(P.x - A.x, P.y - A.y)
