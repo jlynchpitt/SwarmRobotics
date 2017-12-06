@@ -74,7 +74,7 @@ def main():
         newLocationList = deepcopy(locationList)
 
         for i in range (0,newLocationList.numRobots):
-            if(newLocationList.robotList[i].robotID == ROBOT_ID):
+            if(newLocationList.robotList[i].robotID == robID):
                 location = newLocationList.robotList[i]
                 foundLocation = True
                 #print("Found location for green robot")
