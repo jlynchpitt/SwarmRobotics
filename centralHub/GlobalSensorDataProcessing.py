@@ -9,6 +9,7 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from collections import deque
 from swarm.msg import SensorData, RobotLocation, RobotLocationList
+from copy import deepcopy
 
 
 currentRed = 0
@@ -102,13 +103,13 @@ def main():
         #All code for processing data/algorithm goes here
         ########################################################
         if(theData1.red > maxData.red):
-            maxData = theData1
+            maxData = deepcopy(theData1)
         if(theData2.red > maxData.red):
-            maxData = theData2
+            maxData = deepcopy(theData2)
         if(theData3.red > maxData.red):
-            maxData = theData3
+            maxData = deepcopy(theData3)
         if(theData4.red > maxData.red):
-            maxData = theData4
+            maxData = deepcopy(theData4)
 
         
         ########################################################

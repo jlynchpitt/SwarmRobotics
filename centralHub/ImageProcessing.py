@@ -254,9 +254,9 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
             r2 = -1*H
             r3 = W/2
             #r4 = r3 * math.tan(math.radians(15))
-            theta1 = 15
+            theta1 = 20
             theta2 = 90
-            theta3 = 165
+            theta3 = 160
             #theta4 = 90
             
             #Rotate angle
