@@ -112,15 +112,16 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    tempList = deepcopy(theList)
-    globalData = deepcopy(theData)
-    localData = deepcopy(currentData)
+    
     
     while not rospy.is_shutdown():
 
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
+        tempList = deepcopy(theList)
+        globalData = deepcopy(theData)
+        localData = deepcopy(currentData)
 
         for i in range (0,tempList.numRobots):
             #if(tempList.robotList[i].robotID == theData.robotID):
