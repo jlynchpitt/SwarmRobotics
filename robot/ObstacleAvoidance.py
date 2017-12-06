@@ -119,13 +119,9 @@ def main():
                 y = location.y - centerY
                 
                 currentMagnitude = math.sqrt((x*x) + (y*y))
-                #print("current mag: " + str(currentMagnitude))
                 magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
-                #print("multiplier: " + str(magMultiplier))
                 cmdVel.x = x*magMultiplier
                 cmdVel.y = y*magMultiplier
-                #print("vector x: " + str(x) + " vector y: " + str(y))
-                #print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
                 
             #   3a. If close to edge direct robot to center of frame
             #   3b. If not close to edge pass along suggested movement
@@ -183,7 +179,18 @@ def main():
         else:
             cmdVel.x = 0
             cmdVel.y = 0
-        
+            
+        ########################################################
+        #Check the commanded velocity and slow it down if 
+        #   velocity magnitude greater than desired max speed
+        ########################################################
+        goalMagnitude = 45
+        currentMagnitude = math.sqrt((cmdVel.x**2) + (cmdVel.y**2))
+        if currentMagnitude > goalMagnitude:
+            magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
+            cmdVel.x = cmdVel.x*magMultiplier
+            cmdVel.y = cmdVel.y*magMultiplier
+                
         ########################################################
         #Publish data here
         ########################################################

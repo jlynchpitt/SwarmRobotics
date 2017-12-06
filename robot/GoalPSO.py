@@ -19,8 +19,16 @@ cmdVel.y = 25
 theList = RobotLocationList()
 
 targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+targetLocation.robotID = 0
+targetLocation.x = 0
+targetLocation.y = 0
+targetLocation.angle = 0
 
 currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
+currentLocation.robotID = 0
+currentLocation.x = 0
+currentLocation.y = 0
+currentLocation.angle = 0
 
 theData = SensorData() ##theData: SensorData() of the global data
 theData.robotID = 1
@@ -50,9 +58,6 @@ localMaxPos.angle = 0
 vectorX = 0
 vectorY = 0
 
-prevVectorX = 25
-prevVectorY = 25
-
 ########################################################
 #Callback functions for each subscriber
 #	+ any other custom functions needed
@@ -73,7 +78,7 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global prevVectorX, prevVectorY, vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID()
 	########################################################
@@ -108,29 +113,21 @@ def main():
 
         for i in range (0,tempList.numRobots):
             if(tempList.robotList[i].robotID == theData.robotID):
-                targetLocation = tempList.robotList[i]
+                targetLocation = deepcopy(tempList.robotList[i])
 
             if(tempList.robotList[i].robotID == robID):
-                currentLocation = tempList.robotList[i]
+                currentLocation = deepcopy(tempList.robotList[i])
 
         if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
-            localMaxData = currentData
-            localMaxPos = currentLocation
+            localMaxData = deepcopy(currentData)
+            localMaxPos = deepcopy(currentLocation)
 
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
-            vectorX = prevVectorX
-            vectorY = prevVectorY
             vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
             vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
-            prevVectorX = vectorX
-            prevVectorY = vectorY
         elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = prevVectorX
-            vectorY = prevVectorY
             vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
             vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
-            prevVectorX = vectorX
-            prevVectorY = vectorY
         elif(theData.red > 1000 and currentData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
@@ -138,14 +135,15 @@ def main():
         cmdVel.x = int(vectorX)
         cmdVel.y = int(vectorY)
 
-        if(cmdVel.x > 75):
-            cmdVel.x = 75
-        if(cmdVel.y > 75):
-            cmdVel.y = 75
-        if(cmdVel.x < -75):
-            cmdVel.x = -75
-        if(cmdVel.y < -75):
-            cmdVel.y = -75
+        #Probably don't do this here - this will change the angle the robot is moving
+        #if(cmdVel.x > 75):
+        #    cmdVel.x = 75
+        #if(cmdVel.y > 75):
+        #    cmdVel.y = 75
+        #if(cmdVel.x < -75):
+        #    cmdVel.x = -75
+        #if(cmdVel.y < -75):
+        #    cmdVel.y = -75
 		
 		########################################################
 		#Publish data here
