@@ -136,14 +136,14 @@ def main():
         cmdVel.y = int(vectorY)
 
         #Probably don't do this here - this will change the angle the robot is moving
-        #if(cmdVel.x > 75):
-        #    cmdVel.x = 75
-        #if(cmdVel.y > 75):
-        #    cmdVel.y = 75
-        #if(cmdVel.x < -75):
-        #    cmdVel.x = -75
-        #if(cmdVel.y < -75):
-        #    cmdVel.y = -75
+        if(cmdVel.x > 60000):
+            cmdVel.x = 60000
+        if(cmdVel.y > 60000):
+            cmdVel.y = 60000
+        if(cmdVel.x < -60000):
+            cmdVel.x = -60000
+        if(cmdVel.y < -60000):
+            cmdVel.y = -60000
 		
 		########################################################
 		#Publish data here
