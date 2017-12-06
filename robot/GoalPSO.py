@@ -18,11 +18,11 @@ cmdVel.y = 25
 
 theList = RobotLocationList()
 
-targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
-targetLocation.robotID = 0
-targetLocation.x = 0
-targetLocation.y = 0
-targetLocation.angle = 0
+#targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+#targetLocation.robotID = 0
+#targetLocation.x = 0
+#targetLocation.y = 0
+#targetLocation.angle = 0
 
 currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
 currentLocation.robotID = 0
@@ -48,12 +48,12 @@ localMaxData.red = 0
 localMaxData.green = 0
 localMaxData.blue = 0
 
-localMaxPos = RobotLocation()
-localMaxPos.robotID = 1
-localMaxPos.robotColor = ""
-localMaxPos.x = 0
-localMaxPos.y = 0
-localMaxPos.angle = 0
+#localMaxPos = RobotLocation()
+#localMaxPos.robotID = 1
+#localMaxPos.robotColor = ""
+#localMaxPos.x = 0
+#localMaxPos.y = 0
+#localMaxPos.angle = 0
 
 vectorX = 0
 vectorY = 0
@@ -78,7 +78,7 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, currentLocation, cmdVal
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID()
 	########################################################
@@ -104,7 +104,9 @@ def main():
 	#	ready yet
 	########################################################
     tempList = deepcopy(theList)
-
+    globalData = deepcopy(theData)
+    localData = deepcopy(currentData)
+    
     while not rospy.is_shutdown():
 
 		########################################################
@@ -112,50 +114,39 @@ def main():
 		########################################################
 
         for i in range (0,tempList.numRobots):
-            if(tempList.robotList[i].robotID == theData.robotID):
-                targetLocation = deepcopy(tempList.robotList[i])
-
+            #if(tempList.robotList[i].robotID == theData.robotID):
+            #    targetLocation = deepcopy(tempList.robotList[i])
             if(tempList.robotList[i].robotID == robID):
                 currentLocation = deepcopy(tempList.robotList[i])
 
-        if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
-            localMaxData = deepcopy(currentData)
-            localMaxPos = deepcopy(currentLocation)
-
-        ################################################
-        #Convert distance location coordinates to coordinate system used by speed
-        #   location coord system: 0,0 @ top left of image
-        #   speed coord system: 0,0 at center of image
-        ################################################
-        halfWidth = tempList.width/2
-        halfHeight = tempList.height/2
-        targetLocation.x = targetLocation.x - halfWidth
-        targetLocation.y = halfHeight - targetLocation.y
-        currentLocation.x = currentLocation.x - halfWidth
-        currentLocation.y = halfHeight - currentLocation.y
+        if(localData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
+            localMaxData = deepcopy(localData)
+            #localMaxPos = deepcopy(currentLocation)
         
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
-            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
+            vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x)) + (2 * random.random() * (localMaxData.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y)) + (2 * random.random() * (localMaxData.y - currentLocation.y))
         elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
+            vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x) + 10 * random.random() * (localMaxData.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y) + 10 * random.random() * (localMaxData.y - currentLocation.y))
         elif(theData.red > 1000 and currentData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
 
+        #Shrink the velocity down to the max velocity vector
+        ########################################################
+        #Check the commanded velocity and slow it down if 
+        #   velocity magnitude greater than desired max speed
+        ########################################################
+        goalMagnitude = 45
+        currentMagnitude = math.sqrt((cmdVel.x**2) + (cmdVel.y**2))
+        if currentMagnitude > goalMagnitude:
+            magMultiplier = float(goalMagnitude)/float(currentMagnitude)
+            vectorX = vectorX*magMultiplier
+            vectorY = vectorY*magMultiplier
+            
         cmdVel.x = int(vectorX)
         cmdVel.y = int(vectorY)
-
-        #Probably don't do this here - this will change the angle the robot is moving
-        if(cmdVel.x > 30000):
-            cmdVel.x = 30000
-        if(cmdVel.y > 30000):
-            cmdVel.y = 30000
-        if(cmdVel.x < -30000):
-            cmdVel.x = -30000
-        if(cmdVel.y < -30000):
-            cmdVel.y = -30000
 		
 		########################################################
 		#Publish data here
