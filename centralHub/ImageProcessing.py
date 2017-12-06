@@ -246,45 +246,40 @@ def drawRobotInfo(color_image, color_image_raw, pts, contour):
         
         #Test obstacle detection
         if True:            
-            Hm = 0.45 #meters
-            Wm = 1.5*Hm # meters
+            Hm = 0.75 #meters
+            Wm = 0.75 # meters
             W = Wm / yPixelDist #pixels
             H = Hm / xPixelDist # pixels
             r1 = W/2
             r2 = -1*H
-            #r2 = -1*math.sqrt((W**2)/4+H**2)
-            #r3 = r2
-            r4 = W/2
-            theta1 = 0
+            r3 = W/2
+            #r4 = r3 * math.tan(math.radians(15))
+            theta1 = 15
             theta2 = 90
-            #theta2 = math.degrees(math.acos((W/2)/r2))
-            #theta3 = 180-theta2
-            theta4 = 180
+            theta3 = 165
+            #theta4 = 90
             
             #Rotate angle
             theta1 = theta1 - (angle - 90)
             theta2 = theta2 - (angle - 90)
-            #theta3 = theta3 - (angle - 90)
-            theta4 = theta4 - (angle - 90)
+            theta3 = theta3 - (angle - 90)
+            #theta4 = theta4 - (angle - 90)
             
             #Calculate new x and y
             #rcostheta
             x1 = int(r1*math.cos(math.radians(theta1))) + centerX_pix
             y1 = int(r1*math.sin(math.radians(theta1))) + centerY_pix
-            #A = Point(x1, y1)
             x2 = int(r2*math.cos(math.radians(theta2))) + centerX_pix
             y2 = int(r2*math.sin(math.radians(theta2))) + centerY_pix
-            #B = Point(x2, y2)
-            #x3 = int(r3*math.cos(math.radians(theta3))) + centerX_pix
-            #y3 = int(r3*math.sin(math.radians(theta3))) + centerY_pix
-            #C = Point(x3, y3)
-            x4 = int(r4*math.cos(math.radians(theta4))) + centerX_pix
-            y4 = int(r4*math.sin(math.radians(theta4))) + centerY_pix
+            x3 = int(r3*math.cos(math.radians(theta3))) + centerX_pix
+            y3 = int(r3*math.sin(math.radians(theta3))) + centerY_pix
+            #x4 = int(r4*math.cos(math.radians(theta4))) + centerX_pix
+            #y4 = int(r4*math.sin(math.radians(theta4))) + centerY_pix
             cv2.arrowedLine(color_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-            cv2.line(color_image, (x2, y2), (x4, y4), (255, 0, 0), 2)
-            #cv2.line(color_image, (x2, y2), (x3, y3), (255, 0, 0), 2)
-            #cv2.line(color_image, (x3, y3), (x4, y4), (255, 0, 0), 2)
-            cv2.line(color_image, (x4, y4), (x1, y1), (255, 0, 0), 2)
+            cv2.line(color_image, (x2, y2), (x3, y3), (255, 0, 0), 2)
+            cv2.line(color_image, (x3, y3), (x1, y1), (255, 0, 0), 2)
+            #cv2.line(color_image, (x4, y4), (centerX_pix, centerY_pix), (255, 0, 0), 2)
+            #cv2.circle(color_image, (x4, y4), 3, (0, 0, 255))
 
         
         locationList.robotList.append(robot)

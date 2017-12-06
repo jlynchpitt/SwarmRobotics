@@ -134,19 +134,17 @@ def main():
             W = 0.75 # meters
             r1 = float(W)/2
             r2 = -1*H
-            #r2 = -1*math.sqrt((W**2)/4+H**2)
-            #r3 = r2
-            r4 = float(W)/2
+            r3 = float(W)/2
+            r4 = r3 * math.tan(math.radians(15))
             theta1 = 15
             theta2 = 90
-            #theta2 = math.degrees(math.acos((W/2)/r2))
-            #theta3 = 180-theta2
-            theta4 = 165
+            theta3 = 165
+            theta4 = 90
             
             #Rotate angle
             theta1 = theta1 - (location.angle - 90)
             theta2 = theta2 - (location.angle - 90)
-            #theta3 = theta3 - (angle - 90)
+            theta3 = theta3 - (location.angle - 90)
             theta4 = theta4 - (location.angle - 90)
             #print("r1: " + str(r1) + " r2: " + str(r2) + " r4: " + str(r4))
             #print("theta 1: " +str(theta1)+ " 2: " + str(theta2) + " 3: " + str(theta4))
@@ -158,9 +156,12 @@ def main():
             x2 = r2*math.cos(math.radians(theta2)) + location.x
             y2 = r2*math.sin(math.radians(theta2)) + location.y
             B = Point(x2, y2)
-            x3 = r4*math.cos(math.radians(theta4)) + location.x
-            y3 = r4*math.sin(math.radians(theta4)) + location.y
+            x3 = r3*math.cos(math.radians(theta3)) + location.x
+            y3 = r3*math.sin(math.radians(theta3)) + location.y
             C = Point(x3, y3)
+            x4 = r4*math.cos(math.radians(theta4)) + location.x
+            y4 = r4*math.sin(math.radians(theta4)) + location.y
+            D = Point(x4, y4)
 
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
             #   5b. If no other robots in "field of "vision - pass along suggested movement command
@@ -169,8 +170,14 @@ def main():
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
                     print("Checking robot: " + str(newLocationList.robotList[i].robotID))
                     if(PointInTriangle(P, A, B, C) == True):
-                        print("Obstacle in sight")
-                        cmdVel.obstacle = True
+                        if(PointInTriangle(P, A, B, D) == True):
+                            cmdVel.rightObstacle = True
+                            cmdVel.leftObstacle = False
+                            print("Right obstacle")
+                        else:
+                            cmdVel.rightObstacle = False
+                            cmdVel.leftObstacle = True
+                            print("left obstacle")
                     break
         else:
             cmdVel.x = 0
