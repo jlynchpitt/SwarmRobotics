@@ -122,6 +122,18 @@ def main():
             localMaxData = deepcopy(currentData)
             localMaxPos = deepcopy(currentLocation)
 
+        ################################################
+        #Convert distance location coordinates to coordinate system used by speed
+        #   location coord system: 0,0 @ top left of image
+        #   speed coord system: 0,0 at center of image
+        ################################################
+        halfWidth = tempList.width/2
+        halfHeight = tempList.height/2
+        targetLocation.x = targetLocation.x - halfWidth
+        targetLocation.y = halfHeight - targetLocation.y
+        currentLocation.x = currentLocation.x - halfWidth
+        currentLocation.y = halfHeight - currentLocation.y
+        
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
             vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
             vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
