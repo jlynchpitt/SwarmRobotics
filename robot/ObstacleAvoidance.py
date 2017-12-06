@@ -187,7 +187,7 @@ def main():
         goalMagnitude = 45
         currentMagnitude = math.sqrt((cmdVel.x**2) + (cmdVel.y**2))
         if currentMagnitude > goalMagnitude:
-            magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
+            magMultiplier = float(goalMagnitude)/float(currentMagnitude)
             cmdVel.x = cmdVel.x*magMultiplier
             cmdVel.y = cmdVel.y*magMultiplier
                 
