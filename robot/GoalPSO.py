@@ -47,6 +47,8 @@ localMaxData.robotID = 1
 localMaxData.red = 0
 localMaxData.green = 0
 localMaxData.blue = 0
+localMaxData.x = 0
+localMaxData.y = 0
 
 #localMaxPos = RobotLocation()
 #localMaxPos.robotID = 1
@@ -85,7 +87,14 @@ def main():
 	#Initialize the node, any subscribers and any publishers
 	########################################################
     rospy.init_node('goal_pso_node', anonymous=True)
-    rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
+    if(robID == 1):
+        rospy.Subscriber("/local_sensor_data_1", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 2):
+        rospy.Subscriber("/local_sensor_data_2", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 3):
+        rospy.Subscriber("/local_sensor_data_3", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 4):
+        rospy.Subscriber("/local_sensor_data_4", SensorData, updateLocalData, queue_size=10)
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
     if(robID == 1):
