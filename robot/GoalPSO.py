@@ -124,6 +124,8 @@ def main():
             #localMaxPos = deepcopy(currentLocation)
         
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
+            print("Case 1: glob x: " + str(globalData.x) + " cur x: " + str(currentLocation.x) + " local max x: " + str(localMaxData.x))
+            print("vector x: " + str(vectorX))
             vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x)) + (2 * random.random() * (localMaxData.x - currentLocation.x))
             vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y)) + (2 * random.random() * (localMaxData.y - currentLocation.y))
         elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
