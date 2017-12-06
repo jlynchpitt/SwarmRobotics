@@ -96,7 +96,8 @@ def main():
 	
         cmdVel.x = newSugVel.x
         cmdVel.y = newSugVel.y
-        cmdVel.obstacle = False
+        cmdVel.rightObstacle = False
+        cmdVel.leftObstacle = False
         foundLocation = False
         
         #   1. Read in current robot actual angle from location data
@@ -118,13 +119,13 @@ def main():
                 y = location.y - centerY
                 
                 currentMagnitude = math.sqrt((x*x) + (y*y))
-                print("current mag: " + str(currentMagnitude))
+                #print("current mag: " + str(currentMagnitude))
                 magMultiplier = float(goalVelocityMagnitude)/float(currentMagnitude)
-                print("multiplier: " + str(magMultiplier))
+                #print("multiplier: " + str(magMultiplier))
                 cmdVel.x = x*magMultiplier
                 cmdVel.y = y*magMultiplier
-                print("vector x: " + str(x) + " vector y: " + str(y))
-                print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
+                #print("vector x: " + str(x) + " vector y: " + str(y))
+                #print("new x: " + str(cmdVel.x) + " new y: " + str(cmdVel.y))
                 
             #   3a. If close to edge direct robot to center of frame
             #   3b. If not close to edge pass along suggested movement
@@ -136,9 +137,9 @@ def main():
             r2 = -1*H
             r3 = float(W)/2
             r4 = r3 * math.tan(math.radians(15))
-            theta1 = 15
+            theta1 = 20
             theta2 = 90
-            theta3 = 165
+            theta3 = 180
             theta4 = 90
             
             #Rotate angle
@@ -168,16 +169,16 @@ def main():
             for i in range (0,newLocationList.numRobots):
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
-                    print("Checking robot: " + str(newLocationList.robotList[i].robotID))
+                    #print("Checking robot: " + str(newLocationList.robotList[i].robotID))
                     if(PointInTriangle(P, A, B, C) == True):
                         if(PointInTriangle(P, A, B, D) == True):
                             cmdVel.rightObstacle = True
                             cmdVel.leftObstacle = False
-                            print("Right obstacle")
+                            #print("Right obstacle")
                         else:
                             cmdVel.rightObstacle = False
                             cmdVel.leftObstacle = True
-                            print("left obstacle")
+                            #print("left obstacle")
                     break
         else:
             cmdVel.x = 0
