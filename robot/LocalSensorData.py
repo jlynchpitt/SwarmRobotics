@@ -11,6 +11,7 @@ from smbus2 import SMBus
 import time
 from swarm.msg import SensorData, RobotLocation, RobotLocationList
 from Robot_Info import Robot_Info
+from copy import deepcopy
 
 data = SensorData()
 data.robotID = 0
