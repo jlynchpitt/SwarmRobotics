@@ -122,6 +122,14 @@ def main():
         if(localData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
             localMaxData = deepcopy(localData)
             #localMaxPos = deepcopy(currentLocation)
+            
+        ################################################
+        #Convert distance location coordinates to coordinate system used by speed
+        #   location coord system: 0,0 @ top left of image
+        #   speed coord system: 0,0 at center of image
+        ################################################
+        currentLocation.x = currentLocation.x - tempList.width/2
+        currentLocation.y = tempList.height/2 - currentLocation.y
         
         if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
             vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x)) + (2 * random.random() * (localMaxData.x - currentLocation.x))
