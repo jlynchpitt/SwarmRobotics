@@ -174,7 +174,7 @@ def main():
             if vMagnitude == 0:
                 wheelDiff = 0
         elif newCmdVel.rightObstacle == True: #Obstacle - no forward motion just turn
-            clockWise = False
+            clockWise = True
             vMagnitude = 0
             wheelDiff = 20
         else:
