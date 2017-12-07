@@ -18,16 +18,14 @@ cmdVel.y = 25
 
 theList = RobotLocationList()
 
-targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
-targetLocation.robotID = 1
-targetLocation.robotColor = ""
-targetLocation.x = 0
-targetLocation.y = 0
-targetLocation.angle = 0
+#targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+#targetLocation.robotID = 0
+#targetLocation.x = 0
+#targetLocation.y = 0
+#targetLocation.angle = 0
 
 currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
-currentLocation.robotID = 1
-currentLocation.robotColor = ""
+currentLocation.robotID = 0
 currentLocation.x = 0
 currentLocation.y = 0
 currentLocation.angle = 0
@@ -49,19 +47,18 @@ localMaxData.robotID = 1
 localMaxData.red = 0
 localMaxData.green = 0
 localMaxData.blue = 0
+localMaxData.x = 0
+localMaxData.y = 0
 
-localMaxPos = RobotLocation()
-localMaxPos.robotID = 1
-localMaxPos.robotColor = ""
-localMaxPos.x = 0
-localMaxPos.y = 0
-localMaxPos.angle = 0
+#localMaxPos = RobotLocation()
+#localMaxPos.robotID = 1
+#localMaxPos.robotColor = ""
+#localMaxPos.x = 0
+#localMaxPos.y = 0
+#localMaxPos.angle = 0
 
 vectorX = 0
 vectorY = 0
-
-prevVectorX = 25
-prevVectorY = 25
 
 ########################################################
 #Callback functions for each subscriber
@@ -83,24 +80,40 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global prevVectorX, prevVectorY, vectorX, vectorY, currentData, theData, theList, localMaxData, localMaxPos, targetLocation, currentLocation, cmdVal
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, currentLocation, cmdVal, foundIt
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID()
+    foundIt = False
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
     rospy.init_node('goal_pso_node', anonymous=True)
-    rospy.Subscriber("/local_sensor_data", SensorData, updateLocalData, queue_size=10)
+    if(robID == 1):
+        rospy.Subscriber("/local_sensor_data_1", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 2):
+        rospy.Subscriber("/local_sensor_data_2", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 3):
+        rospy.Subscriber("/local_sensor_data_3", SensorData, updateLocalData, queue_size=10)
+    elif(robID == 4):
+        rospy.Subscriber("/local_sensor_data_4", SensorData, updateLocalData, queue_size=10)
     rospy.Subscriber("/global_sensor_data", SensorData, updateGlobalData, queue_size=10)
     rospy.Subscriber("/robot_location", RobotLocationList, updateLocationList, queue_size=10)
     if(robID == 1):
         pub = rospy.Publisher('suggested_movement_1', RobotVelocity, queue_size=10)
+        vectorX = 20
+        vectorY = 20
     elif(robID == 2):
         pub = rospy.Publisher('suggested_movement_2', RobotVelocity, queue_size=10)
+        vectorX = 20
+        vectorY = 0
     elif(robID == 3):
         pub = rospy.Publisher('suggested_movement_3', RobotVelocity, queue_size=10)
+        vectorX = -20
+        vectorY = 20
     else:
         pub = rospy.Publisher('suggested_movement_4', RobotVelocity, queue_size=10)
+        vectorX = 20
+        vectorY = -20
     time.sleep(1)
 	
 	########################################################
@@ -108,59 +121,70 @@ def main():
 	#For data that would crash the program if it was not
 	#	ready yet
 	########################################################
-    tempList = deepcopy(theList)
-
+    
+    
     while not rospy.is_shutdown():
 
 		########################################################
 		#All code for processing data/algorithm goes here
 		########################################################
+        tempList = deepcopy(theList)
+        globalData = deepcopy(theData)
+        localData = deepcopy(currentData)
 
         for i in range (0,tempList.numRobots):
-            if(tempList.robotList[i].robotID == theData.robotID):
-                targetLocation = tempList.robotList[i]
-
+            #if(tempList.robotList[i].robotID == theData.robotID):
+            #    targetLocation = deepcopy(tempList.robotList[i])
             if(tempList.robotList[i].robotID == robID):
-                currentLocation = tempList.robotList[i]
+                currentLocation = deepcopy(tempList.robotList[i])
 
-        if(currentData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
-            localMaxData = currentData
-            localMaxPos = currentLocation
-
-        if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
-            vectorX = prevVectorX
-            vectorY = prevVectorY
-            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x)) + (2 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y)) + (2 * random.random() * (localMaxPos.y - currentLocation.y))
-            prevVectorX = vectorX
-            prevVectorY = vectorY
-        elif(theData.red > 1000 and currentData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = prevVectorX
-            vectorY = prevVectorY
-            vectorX = vectorX + (2 * random.random() * (targetLocation.x - currentLocation.x) + 10 * random.random() * (localMaxPos.x - currentLocation.x))
-            vectorY = vectorY + (2 * random.random() * (targetLocation.y - currentLocation.y) + 10 * (localMaxPos.y - currentLocation.y))
-            prevVectorX = vectorX
-            prevVectorY = vectorY
-        elif(theData.red > 1000 and currentData.red > 1000): ##case where the robot is near the global max threshold, stop it
+        if(localData.red > localMaxData.red): ##update the local max and position if the currentData is greater than the local max
+            localMaxData = deepcopy(localData)
+            #localMaxPos = deepcopy(currentLocation)
+            
+        ################################################
+        #Convert distance location coordinates to coordinate system used by speed
+        #   location coord system: 0,0 @ top left of image
+        #   speed coord system: 0,0 at center of image
+        ################################################
+        currentLocation.x = currentLocation.x - tempList.width/2
+        currentLocation.y = tempList.height/2 - currentLocation.y
+        
+        print("glob x: " + str(globalData.x) + " cur x: " + str(currentLocation.x) + " local max x: " + str(localMaxData.x))
+        print("vector x: " + str(vectorX))
+            
+        if(theData.red < 1000 and (not foundIt)): ##case where the global max threshold has not been met, keep searching
+            vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x)) + (2 * random.random() * (localMaxData.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y)) + (2 * random.random() * (localMaxData.y - currentLocation.y))
+        elif(theData.red > 1000 and localMaxData.red < 1000 and (not foundIt)): ##case where global max threshold has been found, but this robot isn't there yet 
+            vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x) + 10 * random.random() * (localMaxData.x - currentLocation.x))
+            vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y) + 10 * random.random() * (localMaxData.y - currentLocation.y))
+        elif(theData.red > 1000 and localMaxData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
+            foundIt = True
 
+        #Shrink the velocity down to the max velocity vector
+        ########################################################
+        #Check the commanded velocity and slow it down if 
+        #   velocity magnitude greater than desired max speed
+        ########################################################
+        goalMagnitude = 45
+        currentMagnitude = math.sqrt((cmdVel.x**2) + (cmdVel.y**2))
+        if currentMagnitude > goalMagnitude:
+            magMultiplier = float(goalMagnitude)/float(currentMagnitude)
+            vectorX = vectorX*magMultiplier
+            vectorY = vectorY*magMultiplier
+            
         cmdVel.x = int(vectorX)
         cmdVel.y = int(vectorY)
-
-        if(cmdVel.x > 75):
-            cmdVel.x = 75
-        if(cmdVel.y > 75):
-            cmdVel.y = 75
-        if(cmdVel.x < -75):
-            cmdVel.x = -75
-        if(cmdVel.y < -75):
-            cmdVel.y = -75
 		
 		########################################################
 		#Publish data here
 		########################################################
         pub.publish(cmdVel)
+        
+        time.sleep(0.5)
 
 
 if __name__ == '__main__':

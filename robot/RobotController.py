@@ -99,7 +99,7 @@ def main():
         newCmdVel = deepcopy(cmdVel)
         newLocationList = deepcopy(locationList)
 	
-        if(newCmdVel.obstacle == False):
+        if(newCmdVel.rightObstacle == False and newCmdVel.leftObstacle == False):
             # 1. Calculate vector magnitude + angle from XY velocities
             # 2. Calculate desired wheel speed (vMagnitude) 
             #       (identical wheel speed for each wheel if robot was moving forward in a straight line)
@@ -173,10 +173,15 @@ def main():
             # Set wheelDiff + velocity if current goal velocities both 0
             if vMagnitude == 0:
                 wheelDiff = 0
-        else: #Obstacle - no forward motion just turn
+        elif newCmdVel.rightObstacle == True: #Obstacle - no forward motion just turn
+            clockWise = False
+            vMagnitude = 0
+            wheelDiff = 20
+        else:
+            #Left Obstacle - turn right - clockwise
             clockWise = True
             vMagnitude = 0
-            wheelDiff = 9
+            wheelDiff = 20
 
         # clockwise increase left wheel speed
         # counterclockwise - increase right wheel speed

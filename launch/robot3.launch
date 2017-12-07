@@ -1,0 +1,37 @@
+<launch>
+    <node
+        pkg="swarm"
+        type="RobotNode.py"
+        name="robot_node_3"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="RobotController.py"
+        name="robot_controller_3"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="LocalSensorData.py"
+        name="local_data_3"
+        respawn="true"
+    />
+    
+    <node
+        pkg="swarm"
+        type="ObstacleAvoidance.py"
+        name="robot_avoidance_3"
+        respawn="true"
+    />
+
+    <node
+        pkg="swarm"
+        type="GoalPSO.py"
+        name="goal_pso_node_3"
+        respawn="true"
+    />
+
+</launch>

@@ -1,3 +1,4 @@
 int16 x
 int16 y
-bool obstacle
+bool rightObstacle
+bool leftObstacle
