@@ -19,8 +19,18 @@ cmdVel.y = 25
 theList = RobotLocationList()
 
 targetLocation = RobotLocation() ##targetLocation: RobotLocation() of the target robot
+targetLocation.robotID = 1
+targetLocation.robotColor = ""
+targetLocation.x = 0
+targetLocation.y = 0
+targetLocation.angle = 0
 
 currentLocation = RobotLocation() ##currentLocation: RobotLocation() of the current robot
+currentLocation.robotID = 1
+currentLocation.robotColor = ""
+currentLocation.x = 0
+currentLocation.y = 0
+currentLocation.angle = 0
 
 theData = SensorData() ##theData: SensorData() of the global data
 theData.robotID = 1
