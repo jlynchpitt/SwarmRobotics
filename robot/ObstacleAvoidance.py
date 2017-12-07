@@ -162,20 +162,21 @@ def main():
 
             #   5a. If any other robots in "field of vision" - stop robot or change desired velocity
             #   5b. If no other robots in "field of "vision - pass along suggested movement command
+            rightObstacle = False
+            leftObstacle = False
             for i in range (0,newLocationList.numRobots):
                 if(newLocationList.robotList[i].robotID != ROBOT_ID):
                     P = Point(newLocationList.robotList[i].x, newLocationList.robotList[i].y)
                     #print("Checking robot: " + str(newLocationList.robotList[i].robotID))
                     if(PointInTriangle(P, A, B, C) == True):
                         if(PointInTriangle(P, A, B, D) == True):
-                            cmdVel.rightObstacle = True
-                            cmdVel.leftObstacle = False
+                            rightObstacle = True
                             #print("Right obstacle")
                         else:
-                            cmdVel.rightObstacle = False
-                            cmdVel.leftObstacle = True
+                            leftObstacle = True
                             #print("left obstacle")
-                    break
+            cmdVel.rightObstacle = rightObstacle
+            cmdVel.leftObstacle = leftObstacle
         else:
             cmdVel.x = 0
             cmdVel.y = 0
