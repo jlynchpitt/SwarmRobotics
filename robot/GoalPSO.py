@@ -80,9 +80,10 @@ def updateLocationList(data):
     theList = data
 
 def main():
-    global vectorX, vectorY, currentData, theData, theList, localMaxData, currentLocation, cmdVal
+    global vectorX, vectorY, currentData, theData, theList, localMaxData, currentLocation, cmdVal, foundIt
     robotInfo = Robot_Info()
     robID = robotInfo.getRobotID()
+    foundIt = False
 	########################################################
 	#Initialize the node, any subscribers and any publishers
 	########################################################
@@ -152,15 +153,16 @@ def main():
         print("glob x: " + str(globalData.x) + " cur x: " + str(currentLocation.x) + " local max x: " + str(localMaxData.x))
         print("vector x: " + str(vectorX))
             
-        if(theData.red < 1000): ##case where the global max threshold has not been met, keep searching
+        if(theData.red < 1000 and (not foundIt)): ##case where the global max threshold has not been met, keep searching
             vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x)) + (2 * random.random() * (localMaxData.x - currentLocation.x))
             vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y)) + (2 * random.random() * (localMaxData.y - currentLocation.y))
-        elif(theData.red > 1000 and localMaxData.red < 1000): ##case where global max threshold has been found, but this robot isn't there yet 
-            vectorX = vectorX + (2 * random.random() * (globalData.x - currentLocation.x) + 10 * random.random() * (localMaxData.x - currentLocation.x))
-            vectorY = vectorY + (2 * random.random() * (globalData.y - currentLocation.y) + 10 * random.random() * (localMaxData.y - currentLocation.y))
+        elif(theData.red > 1000 and localMaxData.red < 1000 and (not foundIt)): ##case where global max threshold has been found, but this robot isn't there yet 
+            vectorX = vectorX + (10 * random.random() * (globalData.x - currentLocation.x)) + 2 * random.random() * (localMaxData.x - currentLocation.x)
+            vectorY = vectorY + (10 * random.random() * (globalData.y - currentLocation.y)) + 2 * random.random() * (localMaxData.y - currentLocation.y)
         elif(theData.red > 1000 and localMaxData.red > 1000): ##case where the robot is near the global max threshold, stop it
             vectorX = 0
             vectorY = 0
+            foundIt = True
 
         #Shrink the velocity down to the max velocity vector
         ########################################################
